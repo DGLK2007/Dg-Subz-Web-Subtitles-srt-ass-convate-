@@ -467,7 +467,7 @@ label{
     font-size:12.5px;
     color:var(--text-color);
     font-weight:500;
-    max-height:130px;
+    max-height:200px;
     overflow-y:auto;
     padding:11px 14px;
     border-radius:11px;
@@ -479,11 +479,26 @@ label{
 .file-name-display:empty{ display:none; }
 .file-list-display b,
 .file-name-display b{ color:var(--primary-2); font-family:'Outfit',sans-serif; }
-.file-list-display::-webkit-scrollbar{ width:5px; }
-.file-list-display::-webkit-scrollbar-track{ background:transparent; }
-.file-list-display::-webkit-scrollbar-thumb{
+.file-list-display::-webkit-scrollbar,
+.file-name-display::-webkit-scrollbar{ width:5px; }
+.file-list-display::-webkit-scrollbar-track,
+.file-name-display::-webkit-scrollbar-track{ background:transparent; }
+.file-list-display::-webkit-scrollbar-thumb,
+.file-name-display::-webkit-scrollbar-thumb{
     background:var(--primary-2);
     border-radius:10px;
+}
+.zip-info{
+    color:var(--success);
+    font-weight:600;
+    margin-top:6px;
+    padding-top:6px;
+    border-top:1px dashed var(--border-color);
+}
+.zip-sub{
+    color:var(--text-muted);
+    font-size:11.5px;
+    padding-left:8px;
 }
 
 /* ============ INPUTS / SELECTS ============ */
@@ -915,7 +930,7 @@ button.download-btn:hover{
             <div class="feature-card">
                 <div class="feature-icon fast"><i class="fa-solid fa-bolt"></i></div>
                 <h3>SUPER FAST</h3>
-                <p>Batch convert 10+ subtitle files at once and download them as a single ZIP. Translation &amp; styling happen in seconds.</p>
+                <p>Batch convert 15+ subtitle files at once and download them as a single ZIP. Translation &amp; styling happen in seconds.</p>
             </div>
 
             <div class="feature-card">
@@ -994,7 +1009,7 @@ button.download-btn:hover{
             </div>
 
             <div class="form-group">
-                <label>Upload Subtitle Files (.srt / .ass / .zip — up to 10+ files):</label>
+                <label>Upload Subtitle Files (.srt / .ass / .zip — up to 15+ files):</label>
                 <div class="file-drop-zone">
                     <i class="fa-solid fa-file-zipper"></i>
                     <p>Drag &amp; drop or Click to upload .srt / .ass / .zip files (multiple allowed)</p>
@@ -1021,9 +1036,9 @@ button.download-btn:hover{
             <h3><i class="fa-solid fa-circle-info"></i> How to Use — Translator</h3>
             <ol>
                 <li>Select your <b>target language</b> and customize the font, size &amp; style.</li>
-                <li>Upload one or more <b>.srt</b> / <b>.ass</b> files, or a <b>.zip</b> containing subtitle files (10+ files supported).</li>
-                <li>Click <b>“Translate Files”</b> and wait — everything is translated in parallel for speed.</li>
-                <li>Click <b>“Download Translated ZIP”</b> to save all translated subtitles at once.</li>
+                <li>Upload one or more <b>.srt</b> / <b>.ass</b> files, or a <b>.zip</b> containing subtitle files (15+ files supported at once).</li>
+                <li>Click <b>“Translate Files”</b> — all subtitle lines from every file are translated in parallel for maximum speed.</li>
+                <li>Click <b>“Download Translated ZIP”</b> to save all translated files (with watermark) in one ZIP.</li>
             </ol>
         </div>
     </section>
@@ -1034,11 +1049,11 @@ button.download-btn:hover{
             <h2 class="section-title">Multi-Subtitle Converter</h2>
 
             <div class="form-group">
-                <label>Upload Subtitle Files (Up to 10+ .srt/.ass):</label>
+                <label>Upload Subtitle Files (.srt / .ass / .zip — unlimited):</label>
                 <div class="file-drop-zone" id="dropZone">
                     <i class="fa-solid fa-cloud-arrow-up"></i>
-                    <p>Drag &amp; drop or Click to select multiple files</p>
-                    <input type="file" id="subFiles" accept=".srt,.ass" multiple onchange="showFileNames(this)">
+                    <p>Drag &amp; drop or Click to select multiple files (.srt / .ass / .zip)</p>
+                    <input type="file" id="subFiles" accept=".srt,.ass,.zip" multiple onchange="showFileNames(this)">
                 </div>
                 <div class="file-list-display" id="fileListDisplay"></div>
             </div>
@@ -1064,10 +1079,10 @@ button.download-btn:hover{
         <div class="instructions">
             <h3><i class="fa-solid fa-circle-info"></i> How to Use — Converter</h3>
             <ol>
-                <li>Tap the upload box and select <b>multiple subtitle files</b> (10 or more <b>.srt</b> / <b>.ass</b> files at once).</li>
+                <li>Tap the upload box and select <b>multiple subtitle files</b> or <b>.zip</b> files containing subtitles (unlimited files supported).</li>
                 <li>Choose your target format from the dropdown menu.</li>
-                <li>Click the <b>“Convert Files”</b> button.</li>
-                <li>Once converted, click <b>“Download Converted ZIP”</b> to save all files as a single ZIP!</li>
+                <li>Click the <b>“Convert Files”</b> button — every file is converted in one pass.</li>
+                <li>Once done, click <b>“Download Converted ZIP”</b> to save all converted files in a single ZIP.</li>
             </ol>
         </div>
     </section>
@@ -1125,6 +1140,7 @@ button.download-btn:hover{
             <div class="about-tags">
                 <span class="tag">🎬 Subtitle Translator</span>
                 <span class="tag">🔄 SRT ⇄ ASS Converter</span>
+                <span class="tag">📦 ZIP Batch Support</span>
                 <span class="tag">⚡ Batch ZIP Download</span>
                 <span class="tag">🔒 100% Private</span>
             </div>
@@ -1193,40 +1209,139 @@ function toast(msg, type){
 }
 
 /* =========================================================
-   4) FILE DISPLAY
+   4) SHARED HELPERS — file reading & ZIP extraction
 ========================================================= */
-function showFileName(input){
-    const display = document.getElementById('fileNameDisplay');
-    if(input.files.length > 0){
-        if(input.files.length === 1){
-            display.innerHTML = '<b>Selected:</b> ' + input.files[0].name;
-        } else {
-            let text = '<b>Selected Files (' + input.files.length + '):</b><br>';
-            for(let i = 0; i < input.files.length; i++){
-                text += '• ' + input.files[i].name + '<br>';
-            }
-            display.innerHTML = text;
-        }
-    } else {
-        display.innerHTML = "";
-    }
+function readFileAsync(file){
+    return new Promise((resolve, reject)=>{
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.onerror = err => reject(err);
+        reader.readAsText(file);
+    });
 }
 
-function showFileNames(input){
-    const display = document.getElementById('fileListDisplay');
-    if(input.files.length > 0){
-        let text = '<b>Selected Files (' + input.files.length + '):</b><br>';
-        for(let i = 0; i < input.files.length; i++){
-            text += '• ' + input.files[i].name + '<br>';
+/* Expand selected File objects into subtitle items; .zip files are extracted */
+async function expandFilesToSubtitles(filesArray, progressCb){
+    const workFiles = [];
+    for(let fi = 0; fi < filesArray.length; fi++){
+        const file = filesArray[fi];
+        const lower = file.name.toLowerCase();
+
+        if(progressCb) progressCb(`Reading file ${fi+1}/${filesArray.length}: ${file.name}`);
+
+        if(lower.endsWith('.zip')){
+            try{
+                const zip = await JSZip.loadAsync(file);
+                const entries = Object.entries(zip.files);
+                for(const [path, entry] of entries){
+                    if(entry.dir) continue;
+                    const lp = path.toLowerCase();
+                    if(lp.endsWith('.srt') || lp.endsWith('.ass')){
+                        const text = await entry.async('text');
+                        workFiles.push({
+                            name: path.split('/').pop(),
+                            content: text,
+                            isAss: lp.endsWith('.ass'),
+                            fromZip: file.name
+                        });
+                    }
+                }
+            } catch(e){
+                console.warn('Zip error:', file.name, e);
+            }
+        } else if(lower.endsWith('.srt') || lower.endsWith('.ass')){
+            const text = await readFileAsync(file);
+            workFiles.push({
+                name: file.name,
+                content: text,
+                isAss: lower.endsWith('.ass'),
+                fromZip: null
+            });
         }
-        display.innerHTML = text;
-    } else {
-        display.innerHTML = "";
     }
+    return workFiles;
 }
 
 /* =========================================================
-   5) SRT <-> ASS CONVERSION (Converter page — unchanged)
+   5) FILE DISPLAY — with auto zip extraction preview
+========================================================= */
+async function showFileName(input){
+    const display = document.getElementById('fileNameDisplay');
+    if(input.files.length === 0){
+        display.innerHTML = "";
+        return;
+    }
+
+    let html = `<b>Selected Files (${input.files.length}):</b><br>`;
+    for(let i = 0; i < input.files.length; i++){
+        html += '• ' + input.files[i].name + '<br>';
+    }
+    display.innerHTML = html;
+
+    // Extract zip contents for preview
+    let totalInside = 0;
+    for(let i = 0; i < input.files.length; i++){
+        const file = input.files[i];
+        if(file.name.toLowerCase().endsWith('.zip')){
+            try{
+                const zip = await JSZip.loadAsync(file);
+                const names = [];
+                Object.entries(zip.files).forEach(([path, entry])=>{
+                    if(!entry.dir && /\.(srt|ass)$/i.test(path)) names.push(path.split('/').pop());
+                });
+                if(names.length > 0){
+                    totalInside += names.length;
+                    html += `<div class="zip-info">📦 ${file.name} → ${names.length} subtitle file(s) inside:</div>`;
+                    names.forEach(n => { html += `<div class="zip-sub">› ${n}</div>`; });
+                }
+            } catch(e){ /* ignore */ }
+        }
+    }
+    if(totalInside > 0){
+        html += `<div class="zip-info">✅ Total files ready for translation: ${totalInside}</div>`;
+    }
+    display.innerHTML = html;
+}
+
+async function showFileNames(input){
+    const display = document.getElementById('fileListDisplay');
+    if(input.files.length === 0){
+        display.innerHTML = "";
+        return;
+    }
+
+    let html = `<b>Selected Files (${input.files.length}):</b><br>`;
+    for(let i = 0; i < input.files.length; i++){
+        html += '• ' + input.files[i].name + '<br>';
+    }
+    display.innerHTML = html;
+
+    let totalInside = 0;
+    for(let i = 0; i < input.files.length; i++){
+        const file = input.files[i];
+        if(file.name.toLowerCase().endsWith('.zip')){
+            try{
+                const zip = await JSZip.loadAsync(file);
+                const names = [];
+                Object.entries(zip.files).forEach(([path, entry])=>{
+                    if(!entry.dir && /\.(srt|ass)$/i.test(path)) names.push(path.split('/').pop());
+                });
+                if(names.length > 0){
+                    totalInside += names.length;
+                    html += `<div class="zip-info">📦 ${file.name} → ${names.length} subtitle file(s) inside:</div>`;
+                    names.forEach(n => { html += `<div class="zip-sub">› ${n}</div>`; });
+                }
+            } catch(e){ /* ignore */ }
+        }
+    }
+    if(totalInside > 0){
+        html += `<div class="zip-info">✅ Total files ready for conversion: ${totalInside}</div>`;
+    }
+    display.innerHTML = html;
+}
+
+/* =========================================================
+   6) SRT <-> ASS CONVERSION ENGINE
 ========================================================= */
 function processSubtitleContent(content, convertType){
     const lines = content.replace(/\r\n/g, '\n').split('\n');
@@ -1327,17 +1442,8 @@ function formatAssTimeToSrt(timeStr){
     return "00:00:00,000";
 }
 
-function readFileAsync(file){
-    return new Promise((resolve, reject)=>{
-        const reader = new FileReader();
-        reader.onload = e => resolve(e.target.result);
-        reader.onerror = err => reject(err);
-        reader.readAsText(file);
-    });
-}
-
 /* =========================================================
-   6) BATCH CONVERT + SEPARATE DOWNLOAD (Converter page)
+   7) BATCH CONVERT + SEPARATE ZIP DOWNLOAD (ZIP input supported)
 ========================================================= */
 let convertedZipBlob = null;
 
@@ -1350,41 +1456,63 @@ async function convertBatchSubtitles(){
     const downloadBtn = document.getElementById('convDownloadBtn');
 
     if(fileInput.files.length === 0){
-        toast("Please select at least one subtitle file first!", "error");
+        toast("Please select at least one subtitle file or .zip first!", "error");
         return;
     }
 
-    btnText.textContent = "Converting Files...";
+    btnText.textContent = "Reading files...";
     spinner.style.display = "block";
     convertBtn.disabled = true;
     downloadBtn.classList.remove('show');
     convertedZipBlob = null;
 
-    const zip = new JSZip();
-    const newExtension = (convertType === "to_ass") ? ".ass" : ".srt";
-
     try{
-        for(let i = 0; i < fileInput.files.length; i++){
-            const file = fileInput.files[i];
-            const content = await readFileAsync(file);
-            const convertedText = processSubtitleContent(content, convertType);
+        // Expand zips into subtitle files
+        const workFiles = await expandFilesToSubtitles(Array.from(fileInput.files), (msg)=>{
+            btnText.textContent = msg;
+        });
 
-            const originalName = file.name;
-            const dot = originalName.lastIndexOf('.');
-            const baseName = dot > 0 ? originalName.substring(0, dot) : originalName;
-            const newFileName = baseName + "_DG" + newExtension;
-
-            zip.file(newFileName, convertedText);
+        if(workFiles.length === 0){
+            toast("No valid subtitle files found.", "error");
+            btnText.textContent = "Convert Files";
+            spinner.style.display = "none";
+            convertBtn.disabled = false;
+            return;
         }
 
-        convertedZipBlob = await zip.generateAsync({ type: "blob" });
+        const newExtension = (convertType === "to_ass") ? ".ass" : ".srt";
+        const outZip = new JSZip();
+        const usedNames = {};
+
+        for(let i = 0; i < workFiles.length; i++){
+            const wf = workFiles[i];
+            btnText.textContent = `Converting ${i+1}/${workFiles.length}...`;
+
+            const convertedText = processSubtitleContent(wf.content, convertType);
+
+            const dot = wf.name.lastIndexOf('.');
+            const baseName = dot > 0 ? wf.name.substring(0, dot) : wf.name;
+            let outName = baseName + "_DG" + newExtension;
+
+            if(usedNames[outName]){
+                usedNames[outName]++;
+                outName = baseName + "_DG_" + usedNames[outName] + newExtension;
+            } else {
+                usedNames[outName] = 1;
+            }
+            outZip.file(outName, convertedText);
+        }
+
+        convertedZipBlob = await outZip.generateAsync({ type: "blob" });
         downloadBtn.classList.add('show');
-        toast("Conversion complete! Click Download to save ZIP.", "success");
+        btnText.textContent = `Converted ${workFiles.length} file(s) ✅`;
+        toast(`Converted ${workFiles.length} file(s)! Click Download.`, "success");
+
     } catch(err){
         console.error(err);
-        toast("Something went wrong while converting. Please try again.", "error");
-    } finally {
+        toast("Something went wrong: " + (err.message || "Unknown error"), "error");
         btnText.textContent = "Convert Files";
+    } finally {
         spinner.style.display = "none";
         convertBtn.disabled = false;
     }
@@ -1406,18 +1534,15 @@ function downloadConvertedZip(){
 }
 
 /* =========================================================
-   7) TRANSLATOR — BATCH SUPPORT (multiple files + ZIP input)
+   8) TRANSLATOR — BATCH (multiple files + ZIP) + SPOKEN SINHALA
 ========================================================= */
 let translatedZipBlob = null;
-
 const WATERMARK_TEXT = "dgsubz.netlify.app sinhala subtitles";
 
 /* --- Translate one line with retries --- */
 async function translateSingleLine(text, targetLang, retries){
     if(retries === undefined) retries = 3;
-    if(!text.trim() || !isNaN(text.trim()) || text.includes('-->')){
-        return text;
-    }
+    if(!text.trim() || !isNaN(text.trim()) || text.includes('-->')) return text;
 
     const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
 
@@ -1428,9 +1553,7 @@ async function translateSingleLine(text, targetLang, retries){
             const data = await response.json();
             if(data && data[0] && Array.isArray(data[0])){
                 let translated = '';
-                data[0].forEach(item=>{
-                    if(item && item[0]) translated += item[0];
-                });
+                data[0].forEach(item=>{ if(item && item[0]) translated += item[0]; });
                 if(translated && translated.trim()) return translated;
             }
             throw new Error("Empty translation");
@@ -1443,17 +1566,83 @@ async function translateSingleLine(text, targetLang, retries){
     return text; // keep original — never drop a line
 }
 
+/* --- Convert formal/written Sinhala → natural spoken Sinhala --- */
 function makeSinhalaSpoken(text){
     if(!text) return text;
-    return text
-        .replace(/වේවා/g, "වේන්")
-        .replace(/කරයි/g, "කරනවා")
-        .replace(/යයි/g, "යනවා")
-        .replace(/පවසයි/g, "කියනවා")
-        .replace(/ඇත/g, "තියෙනවා")
-        .replace(/වේ/g, "වෙනවා")
-        .replace(/නිසා/g, "හින්දා")
-        .replace(/සඳහා/g, "වුවමනා");
+    let t = text;
+
+    /* Multi-word phrases (longest first) */
+    t = t.replace(/කියා\s+සිටියේය/g, 'කිව්වා');
+    t = t.replace(/පිළිතුරු\s+දුන්නේය/g, 'උත්තර දුන්නා');
+    t = t.replace(/අවසන්\s+කළේය/g, 'ඉවර කළා');
+    t = t.replace(/ආරම්භ\s+කළේය/g, 'පටන් ගත්තා');
+    t = t.replace(/පටන්\s+ගත්තේය/g, 'පටන් ගත්තා');
+    t = t.replace(/පිටව\s+ගියේය/g, 'පිටත් වුණා');
+    t = t.replace(/බලාපොරොත්තු\s+විය/g, 'බලාපොරොත්තු වුණා');
+    t = t.replace(/හැකි\s+විය/g, 'පුළුවන් වුණා');
+    t = t.replace(/හැකි\s+වේ/g, 'පුළුවන් වෙනවා');
+    t = t.replace(/අවශ්‍ය\s+විය/g, 'ඕනේ වුණා');
+    t = t.replace(/අවශ්‍ය\s+වේ/g, 'ඕනේ වෙනවා');
+    t = t.replace(/කියා\s+ඇත/g, 'කියලා තියෙනවා');
+    t = t.replace(/සඳහන්\s+විය/g, 'සඳහන් වුණා');
+
+    /* Past tense -ේය endings */
+    t = t.replace(/ගියේය/g, 'ගියා');
+    t = t.replace(/ආවේය/g, 'ආවා');
+    t = t.replace(/කළේය/g, 'කළා');
+    t = t.replace(/කීවේය/g, 'කිව්වා');
+    t = t.replace(/දුන්නේය/g, 'දුන්නා');
+    t = t.replace(/ගත්තේය/g, 'ගත්තා');
+    t = t.replace(/වූයේය/g, 'වුණා');
+    t = t.replace(/සිටියේය/g, 'හිටියා');
+    t = t.replace(/තිබුණේය/g, 'තිබුණා');
+    t = t.replace(/පැවසීය/g, 'කිව්වා');
+    t = t.replace(/පැවැසීය/g, 'කිව්වා');
+    t = t.replace(/දැක්වීය/g, 'පෙන්නුවා');
+    t = t.replace(/සොයා\s+ගත්තේය/g, 'හොයා ගත්තා');
+
+    /* Present tense -යි / -නී endings */
+    t = t.replace(/කරයි/g, 'කරනවා');
+    t = t.replace(/කියයි/g, 'කියනවා');
+    t = t.replace(/දෙයි/g, 'දෙනවා');
+    t = t.replace(/ගනී/g, 'ගන්නවා');
+    t = t.replace(/බලයි/g, 'බලනවා');
+    t = t.replace(/ලබයි/g, 'ලබනවා');
+    t = t.replace(/සොයයි/g, 'හොයනවා');
+    t = t.replace(/සිටී/g, 'ඉන්නවා');
+    t = t.replace(/යයි(?=[\s.,!?;:]|$)/g, 'යනවා');
+    t = t.replace(/එයි(?=[\s.,!?;:]|$)/g, 'එනවා');
+
+    /* Word-boundary–safe replacements (avoids breaking compound words) */
+    t = t.replace(/(^|[\s.,!?;:"'()])විය(?=[\s.,!?;:]|$)/g, '$1වුණා');
+    t = t.replace(/(^|[\s.,!?;:"'()])වේ(?=[\s.,!?;:]|$)/g, '$1වෙනවා');
+    t = t.replace(/(^|[\s.,!?;:"'()])ඇත(?=[\s.,!?;:]|$)/g, '$1තියෙනවා');
+    t = t.replace(/(^|[\s.,!?;:"'()])නැත(?=[\s.,!?;:]|$)/g, '$1නැහැ');
+    t = t.replace(/(^|[\s.,!?;:"'()])හැකිය(?=[\s.,!?;:]|$)/g, '$1පුළුවන්');
+    t = t.replace(/(^|[\s.,!?;:"'()])බැරිය(?=[\s.,!?;:]|$)/g, '$1බැහැ');
+    t = t.replace(/(^|[\s.,!?;:"'()])යුතුය(?=[\s.,!?;:]|$)/g, '$1ඕනේ');
+
+    t = t.replace(/තිබේ/g, 'තියෙනවා');
+    t = t.replace(/තිබුණි/g, 'තිබුණා');
+    t = t.replace(/ඉන්නේ/g, 'ඉන්නවා');
+
+    /* Grammatical markers → colloquial forms */
+    t = t.replace(/යැයි/g, 'කියලා');
+    t = t.replace(/නිසා/g, 'හින්දා');
+    t = t.replace(/හෙයින්/g, 'හින්දා');
+    t = t.replace(/බැවින්/g, 'හින්දා');
+    t = t.replace(/සඳහා/g, 'වෙනුවෙන්');
+    t = t.replace(/ලෙසින්/g, 'විදියට');
+    t = t.replace(/ලෙස(?=[\s.,!?;:]|$)/g, 'විදියට');
+    t = t.replace(/වශයෙන්/g, 'විදියට');
+    t = t.replace(/පමණක්/g, 'විතරයි');
+    t = t.replace(/කෙරෙහි/g, 'දිහා');
+    t = t.replace(/වෙත(?=[\s.,!?;:]|$)/g, 'ලඟට');
+    t = t.replace(/දෙස(?=[\s.,!?;:]|$)/g, 'දිහා');
+    t = t.replace(/රැගෙන/g, 'අරගෙන');
+    t = t.replace(/වේවා/g, 'වේන්');
+
+    return t;
 }
 
 function hexToRgbAss(hex){
@@ -1464,22 +1653,17 @@ function hexToRgbAss(hex){
     return `&H00${b}${g}${r}&`.toUpperCase();
 }
 
-/* --- Insert watermark dialogues into an ASS file --- */
+/* Insert watermark dialogues into an ASS file */
 function insertAssWatermark(outputLines){
-    // find the last [Events] header
     let lastEventsIdx = -1;
     for(let i = 0; i < outputLines.length; i++){
         if(outputLines[i].trim() === '[Events]') lastEventsIdx = i;
     }
     if(lastEventsIdx < 0) return outputLines;
 
-    // find the Format line inside [Events]
     let formatIdx = -1;
     for(let i = lastEventsIdx + 1; i < outputLines.length; i++){
-        if(outputLines[i].trim().startsWith('Format:')){
-            formatIdx = i;
-            break;
-        }
+        if(outputLines[i].trim().startsWith('Format:')){ formatIdx = i; break; }
     }
 
     const wmIntro = `Dialogue: 0,0:00:01.00,0:00:05.00,Default,,0,0,0,,{\\an8\\c&H00FFCC&\\fs20\\bord1}${WATERMARK_TEXT}`;
@@ -1514,7 +1698,6 @@ async function startTranslation(){
         return;
     }
 
-    // reset state
     translatedZipBlob = null;
     btnText.textContent = "Reading files...";
     spinner.style.display = "block";
@@ -1527,44 +1710,10 @@ async function startTranslation(){
     const isItalic = (fontStyle === 'italic' || fontStyle === 'bolditalic');
 
     try{
-        /* ---------- STEP 1: Collect all files (extract zips) ---------- */
-        const workFiles = [];   // { name, content, isAss }
-        const filesArr = Array.from(fileInput.files);
-
-        for(let fi = 0; fi < filesArr.length; fi++){
-            const file = filesArr[fi];
-            const lower = file.name.toLowerCase();
-
-            btnText.textContent = `Reading file ${fi+1}/${filesArr.length}: ${file.name}`;
-
-            if(lower.endsWith('.zip')){
-                try{
-                    const zip = await JSZip.loadAsync(file);
-                    const entries = Object.entries(zip.files);
-                    for(const [path, entry] of entries){
-                        if(entry.dir) continue;
-                        const lp = path.toLowerCase();
-                        if(lp.endsWith('.srt') || lp.endsWith('.ass')){
-                            const text = await entry.async('text');
-                            workFiles.push({
-                                name: path.split('/').pop(),
-                                content: text,
-                                isAss: lp.endsWith('.ass')
-                            });
-                        }
-                    }
-                } catch(zipErr){
-                    console.warn("Failed to read zip:", file.name, zipErr);
-                }
-            } else if(lower.endsWith('.srt') || lower.endsWith('.ass')){
-                const text = await readFileAsync(file);
-                workFiles.push({
-                    name: file.name,
-                    content: text,
-                    isAss: lower.endsWith('.ass')
-                });
-            }
-        }
+        /* STEP 1: Expand files (extract zips) */
+        const workFiles = await expandFilesToSubtitles(Array.from(fileInput.files), (msg)=>{
+            btnText.textContent = msg;
+        });
 
         if(workFiles.length === 0){
             toast("No valid subtitle files found in your selection.", "error");
@@ -1575,8 +1724,8 @@ async function startTranslation(){
             return;
         }
 
-        /* ---------- STEP 2: Collect all translation jobs ---------- */
-        const allJobs = [];   // { fi, li, text, parts?, isAss }
+        /* STEP 2: Collect all translation jobs across every file */
+        const allJobs = [];
         for(let fi = 0; fi < workFiles.length; fi++){
             const wf = workFiles[fi];
             wf.lines = wf.content.replace(/\r\n/g, '\n').split('\n');
@@ -1611,17 +1760,18 @@ async function startTranslation(){
         const totalJobs = allJobs.length;
 
         if(totalJobs === 0){
-            // Nothing to translate — still produce output with watermark
-            const outZip = new JSZip();
+            // No text — just add watermark and package
             const assColor = hexToRgbAss(fontColorHex);
             let assTag = `\\fn${fontName}\\fs${fontSize}\\c${assColor}`;
             if(isBold) assTag += `\\b1`;
             if(isItalic) assTag += `\\i1`;
 
+            const outZip = new JSZip();
+            const usedNames0 = {};
+
             for(const wf of workFiles){
                 let outLines = wf.lines.slice();
                 let finalContent;
-
                 if(wf.isAss){
                     outLines = insertAssWatermark(outLines);
                     finalContent = outLines.join('\n');
@@ -1630,10 +1780,12 @@ async function startTranslation(){
                     const outro = `\n\n9999\n99:59:58,000 --> 99:59:59,000\n<font color='#00ffcc'>[ ${WATERMARK_TEXT} ]</font>\n`;
                     finalContent = intro + outLines.join('\n') + outro;
                 }
-
                 const ext = wf.isAss ? '.ass' : '.srt';
                 const base = wf.name.replace(/\.(srt|ass)$/i, '');
-                outZip.file(base + '_DG' + ext, finalContent);
+                let outName = base + '_DG' + ext;
+                if(usedNames0[outName]){ usedNames0[outName]++; outName = base + '_DG_' + usedNames0[outName] + ext; }
+                else usedNames0[outName] = 1;
+                outZip.file(outName, finalContent);
             }
 
             translatedZipBlob = await outZip.generateAsync({ type: 'blob' });
@@ -1648,8 +1800,8 @@ async function startTranslation(){
 
         btnText.textContent = `Translating 0 / ${totalJobs}...`;
 
-        /* ---------- STEP 3: Parallel translation (high concurrency) ---------- */
-        const CONCURRENCY = 15;
+        /* STEP 3: Parallel translation — 20 concurrent requests */
+        const CONCURRENCY = 20;
         const results = new Array(totalJobs);
         let nextIdx = 0;
         let completed = 0;
@@ -1658,14 +1810,12 @@ async function startTranslation(){
             while(true){
                 const i = nextIdx++;
                 if(i >= totalJobs) return;
-
                 const job = allJobs[i];
                 let translated = await translateSingleLine(job.text, targetLang);
                 if(targetLang === 'si'){
                     translated = makeSinhalaSpoken(translated);
                 }
                 results[i] = translated;
-
                 completed++;
                 if(completed % 3 === 0 || completed === totalJobs){
                     const prog = Math.round((completed / totalJobs) * 100);
@@ -1680,7 +1830,7 @@ async function startTranslation(){
         for(let w = 0; w < workerCount; w++) workers.push(worker());
         await Promise.all(workers);
 
-        /* ---------- STEP 4: Rebuild each file + add watermark ---------- */
+        /* STEP 4: Rebuild every file + add watermark */
         const assColor = hexToRgbAss(fontColorHex);
         let assTag = `\\fn${fontName}\\fs${fontSize}\\c${assColor}`;
         if(isBold) assTag += `\\b1`;
@@ -1692,7 +1842,6 @@ async function startTranslation(){
         for(const wf of workFiles){
             const outputLines = wf.lines.slice();
 
-            // Apply translations
             for(const jobIdx of wf.jobIndexes){
                 const job = allJobs[jobIdx];
                 const translated = results[jobIdx];
@@ -1723,7 +1872,6 @@ async function startTranslation(){
                 finalContent = intro + outputLines.join('\n') + outro;
             }
 
-            // Build unique output filename
             const ext = wf.isAss ? '.ass' : '.srt';
             const base = wf.name.replace(/\.(srt|ass)$/i, '');
             let outName = base + '_DG' + ext;
@@ -1733,11 +1881,10 @@ async function startTranslation(){
             } else {
                 usedNames[outName] = 1;
             }
-
             outputZip.file(outName, finalContent);
         }
 
-        /* ---------- STEP 5: Create ZIP & enable download ---------- */
+        /* STEP 5: Package into single ZIP */
         translatedZipBlob = await outputZip.generateAsync({ type: 'blob' });
 
         progressBar.style.width = "100%";
@@ -1745,7 +1892,7 @@ async function startTranslation(){
         spinner.style.display = "none";
         transBtn.disabled = false;
         downloadBtn.classList.add('show');
-        toast(`Successfully translated ${workFiles.length} file(s)! Click Download.`, "success");
+        toast(`Translated ${workFiles.length} file(s)! Click Download.`, "success");
 
     } catch(err){
         console.error(err);
