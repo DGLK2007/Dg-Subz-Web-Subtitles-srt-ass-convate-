@@ -5,13 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DG SUBZ | Subtitle Translator & Converter</title>
 
-<!-- Google Fonts & FontAwesome -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<!-- JSZip -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <style>
@@ -921,7 +919,6 @@ button.download-btn:hover{
             </div>
         </div>
 
-        <!-- 3 FEATURE BOXES -->
         <div class="features">
             <div class="feature-card">
                 <div class="feature-icon free"><i class="fa-solid fa-gift"></i></div>
@@ -932,7 +929,7 @@ button.download-btn:hover{
             <div class="feature-card">
                 <div class="feature-icon fast"><i class="fa-solid fa-bolt"></i></div>
                 <h3>SUPER FAST</h3>
-                <p>Batch convert 10+ subtitle files at once and download them as a single ZIP. Translation &amp; styling happen in seconds.</p>
+                <p>Batch translate &amp; convert 20-30+ subtitle files at once with parallel processing and download as a single ZIP.</p>
             </div>
 
             <div class="feature-card">
@@ -1009,11 +1006,11 @@ button.download-btn:hover{
             </div>
 
             <div class="form-group">
-                <label>Upload Subtitle File (.srt or .ass):</label>
+                <label>Upload Subtitle File(s) — Multiple Supported (.srt or .ass):</label>
                 <div class="file-drop-zone">
                     <i class="fa-solid fa-file-arrow-up"></i>
-                    <p>Drag &amp; drop or Click to upload .srt / .ass file</p>
-                    <input type="file" id="subFile" accept=".srt,.ass" onchange="showFileName(this)">
+                    <p>Drag &amp; drop or Click to upload<br><b>.srt / .ass</b> files (10+ files supported)</p>
+                    <input type="file" id="subFile" accept=".srt,.ass" multiple onchange="showFileName(this)">
                 </div>
                 <div class="file-name-display" id="fileNameDisplay"></div>
             </div>
@@ -1028,7 +1025,7 @@ button.download-btn:hover{
             </div>
 
             <button class="download-btn" id="downloadBtn" onclick="downloadTranslatedFile()">
-                <i class="fa-solid fa-download"></i> Download Formatted Subtitle
+                <i class="fa-solid fa-download"></i> Download Translated ZIP
             </button>
         </div>
 
@@ -1036,9 +1033,9 @@ button.download-btn:hover{
             <h3><i class="fa-solid fa-circle-info"></i> How to Use — Translator</h3>
             <ol>
                 <li>Select your <b>target language</b> and customize the font, size &amp; style.</li>
-                <li>Upload either a <b>.srt</b> or <b>.ass</b> subtitle file.</li>
-                <li>Click <b>“Translate &amp; Apply Styles”</b> and wait until it reaches 100%.</li>
-                <li>Click the appearing <b>Download</b> button to save your translated subtitle!</li>
+                <li>Upload <b>one or multiple</b> subtitle files (.srt / .ass) — 10-20 files එකපාර දාන්න පුළුවන්.</li>
+                <li>Click <b>"Translate &amp; Apply Styles"</b> — batch translation runs in parallel for speed.</li>
+                <li>Click <b>"Download Translated ZIP"</b> to save all translated files as a single ZIP.</li>
             </ol>
         </div>
     </section>
@@ -1049,10 +1046,10 @@ button.download-btn:hover{
             <h2 class="section-title">Multi-Subtitle Converter</h2>
 
             <div class="form-group">
-                <label>Upload Subtitle Files (Up to 10+ .srt/.ass):</label>
+                <label>Upload Subtitle Files (Up to 30+ .srt/.ass):</label>
                 <div class="file-drop-zone" id="dropZone">
                     <i class="fa-solid fa-cloud-arrow-up"></i>
-                    <p>Drag &amp; drop or Click to select multiple files</p>
+                    <p>Drag &amp; drop or Click to select multiple files<br><b>20-30 files</b> එකපාර convert කරන්න පුළුවන්</p>
                     <input type="file" id="subFiles" accept=".srt,.ass" multiple onchange="showFileNames(this)">
                 </div>
                 <div class="file-list-display" id="fileListDisplay"></div>
@@ -1071,6 +1068,10 @@ button.download-btn:hover{
                 <div class="spinner" id="convSpinner"></div>
             </button>
 
+            <div class="progress-wrap" id="convProgressWrap">
+                <div class="progress-bar" id="convProgressBar"></div>
+            </div>
+
             <button class="download-btn" id="convDownloadBtn" onclick="downloadConvertedZip()">
                 <i class="fa-solid fa-download"></i> Download Converted ZIP
             </button>
@@ -1079,10 +1080,10 @@ button.download-btn:hover{
         <div class="instructions">
             <h3><i class="fa-solid fa-circle-info"></i> How to Use — Converter</h3>
             <ol>
-                <li>Tap the upload box and select <b>multiple subtitle files</b> (10 or more <b>.srt</b> / <b>.ass</b> files at once).</li>
+                <li>Tap the upload box and select <b>multiple subtitle files</b> (20-30+ files at once).</li>
                 <li>Choose your target format from the dropdown menu.</li>
-                <li>Click the <b>“Convert Files”</b> button.</li>
-                <li>Once converted, click <b>“Download Converted ZIP”</b> to save all files as a single ZIP!</li>
+                <li>Click the <b>"Convert Files"</b> button — progress bar will show conversion status.</li>
+                <li>Once converted, click <b>"Download Converted ZIP"</b> to save all files as a single ZIP!</li>
             </ol>
         </div>
     </section>
@@ -1204,45 +1205,74 @@ function toast(msg, type){
     el.textContent = msg;
     el.className = 'toast show' + (type ? ' ' + type : '');
     clearTimeout(el._timer);
-    el._timer = setTimeout(()=>{ el.classList.remove('show'); }, 3200);
+    el._timer = setTimeout(()=>{ el.classList.remove('show'); }, 3500);
 }
 
 /* =========================================================
-   4) FILE DISPLAY
+   4) FILE DISPLAY (multi-file support)
 ========================================================= */
-let isAssFile = false;
-let downloadedFileName = "sub_translated.srt";
-
 function showFileName(input){
     const display = document.getElementById('fileNameDisplay');
-    if(input.files.length > 0){
-        const file = input.files[0];
-        display.innerHTML = '<b>Selected:</b> ' + file.name;
-        isAssFile = file.name.toLowerCase().endsWith('.ass');
-        const ext = isAssFile ? '.ass' : '.srt';
-        const dot = file.name.lastIndexOf('.');
-        const base = dot > 0 ? file.name.substring(0, dot) : file.name;
-        downloadedFileName = base + "_DG_Subz" + ext;
-    } else {
+    const files = input.files;
+    if(files.length === 0){
         display.innerHTML = "";
+        return;
+    }
+    if(files.length === 1){
+        display.innerHTML = '<b>Selected:</b> ' + files[0].name;
+    } else {
+        let text = '<b>Selected Files (' + files.length + '):</b><br>';
+        const maxShow = 25;
+        for(let i = 0; i < Math.min(files.length, maxShow); i++){
+            text += '• ' + files[i].name + '<br>';
+        }
+        if(files.length > maxShow){
+            text += '• ... and ' + (files.length - maxShow) + ' more';
+        }
+        display.innerHTML = text;
     }
 }
 
 function showFileNames(input){
     const display = document.getElementById('fileListDisplay');
-    if(input.files.length > 0){
-        let text = '<b>Selected Files (' + input.files.length + '):</b><br>';
-        for(let i = 0; i < input.files.length; i++){
-            text += '• ' + input.files[i].name + '<br>';
-        }
-        display.innerHTML = text;
-    } else {
+    const files = input.files;
+    if(files.length === 0){
         display.innerHTML = "";
+        return;
     }
+    let text = '<b>Selected Files (' + files.length + '):</b><br>';
+    const maxShow = 35;
+    for(let i = 0; i < Math.min(files.length, maxShow); i++){
+        text += '• ' + files[i].name + '<br>';
+    }
+    if(files.length > maxShow){
+        text += '• ... and ' + (files.length - maxShow) + ' more';
+    }
+    display.innerHTML = text;
 }
 
 /* =========================================================
-   5) SRT <-> ASS CONVERSION
+   5) HELPERS
+========================================================= */
+function readFileAsync(file){
+    return new Promise((resolve, reject)=>{
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.onerror = err => reject(err);
+        reader.readAsText(file);
+    });
+}
+
+function hexToRgbAss(hex){
+    const c = hex.replace('#', '');
+    const r = c.substring(0, 2);
+    const g = c.substring(2, 4);
+    const b = c.substring(4, 6);
+    return `&H00${b}${g}${r}&`.toUpperCase();
+}
+
+/* =========================================================
+   6) SRT <-> ASS CONVERSION
 ========================================================= */
 function processSubtitleContent(content, convertType){
     const lines = content.replace(/\r\n/g, '\n').split('\n');
@@ -1343,17 +1373,8 @@ function formatAssTimeToSrt(timeStr){
     return "00:00:00,000";
 }
 
-function readFileAsync(file){
-    return new Promise((resolve, reject)=>{
-        const reader = new FileReader();
-        reader.onload = e => resolve(e.target.result);
-        reader.onerror = err => reject(err);
-        reader.readAsText(file);
-    });
-}
-
 /* =========================================================
-   6) BATCH CONVERT + SEPARATE DOWNLOAD
+   7) BATCH CONVERTER (20-30 files supported, with progress)
 ========================================================= */
 let convertedZipBlob = null;
 
@@ -1364,45 +1385,74 @@ async function convertBatchSubtitles(){
     const spinner     = document.getElementById('convSpinner');
     const convertBtn  = document.getElementById('convBtn');
     const downloadBtn = document.getElementById('convDownloadBtn');
+    const progressWrap = document.getElementById('convProgressWrap');
+    const progressBar  = document.getElementById('convProgressBar');
 
     if(fileInput.files.length === 0){
         toast("Please select at least one subtitle file first!", "error");
         return;
     }
 
+    const files = Array.from(fileInput.files);
     btnText.textContent = "Converting Files...";
     spinner.style.display = "block";
     convertBtn.disabled = true;
     downloadBtn.classList.remove('show');
+    progressWrap.classList.add('show');
+    progressBar.style.width = "0%";
     convertedZipBlob = null;
 
     const zip = new JSZip();
     const newExtension = (convertType === "to_ass") ? ".ass" : ".srt";
+    const failures = [];
 
     try{
-        for(let i = 0; i < fileInput.files.length; i++){
-            const file = fileInput.files[i];
-            const content = await readFileAsync(file);
-            const convertedText = processSubtitleContent(content, convertType);
+        for(let i = 0; i < files.length; i++){
+            const file = files[i];
+            try{
+                const content = await readFileAsync(file);
+                const convertedText = processSubtitleContent(content, convertType);
+                const originalName = file.name;
+                const dot = originalName.lastIndexOf('.');
+                const baseName = dot > 0 ? originalName.substring(0, dot) : originalName;
+                const newFileName = baseName + "_DG" + newExtension;
+                zip.file(newFileName, convertedText);
+            } catch(fileErr){
+                console.error("Failed file:", file.name, fileErr);
+                failures.push(file.name);
+            }
 
-            const originalName = file.name;
-            const dot = originalName.lastIndexOf('.');
-            const baseName = dot > 0 ? originalName.substring(0, dot) : originalName;
-            const newFileName = baseName + "_DG" + newExtension;
-
-            zip.file(newFileName, convertedText);
+            const prog = Math.round(((i + 1) / files.length) * 90);
+            progressBar.style.width = prog + "%";
+            btnText.textContent = `Converting ${i + 1} / ${files.length} (${prog}%)`;
         }
 
-        convertedZipBlob = await zip.generateAsync({ type: "blob" });
-        downloadBtn.classList.add('show');
-        toast("Conversion complete! Click Download to save ZIP.", "success");
-    } catch(err){
-        console.error(err);
-        toast("Something went wrong while converting. Please try again.", "error");
-    } finally {
+        btnText.textContent = "Packaging ZIP...";
+        convertedZipBlob = await zip.generateAsync({
+            type: "blob",
+            compression: "DEFLATE",
+            compressionOptions: { level: 1 }
+        });
+
+        progressBar.style.width = "100%";
         btnText.textContent = "Convert Files";
         spinner.style.display = "none";
         convertBtn.disabled = false;
+        downloadBtn.classList.add('show');
+
+        const successCount = files.length - failures.length;
+        if(failures.length > 0){
+            toast(`${successCount} file(s) converted, ${failures.length} failed. Click Download.`, "error");
+        } else {
+            toast(`All ${files.length} file(s) converted successfully! Click Download.`, "success");
+        }
+    } catch(err){
+        console.error(err);
+        btnText.textContent = "Convert Files";
+        spinner.style.display = "none";
+        convertBtn.disabled = false;
+        progressWrap.classList.remove('show');
+        toast("Something went wrong while converting. Please try again.", "error");
     }
 }
 
@@ -1422,16 +1472,13 @@ function downloadConvertedZip(){
 }
 
 /* =========================================================
-   7) TRANSLATOR (Fast parallel + retry-safe)
+   8) TRANSLATION ENGINE (Fast batch + robust fallback)
 ========================================================= */
-let finalTranslatedContent = "";
 
-/* Translate one line with retries */
+/* Single-line translation (fallback for edge cases) */
 async function translateSingleLine(text, targetLang, retries){
     if(retries === undefined) retries = 3;
-    if(!text.trim() || !isNaN(text.trim()) || text.includes('-->')){
-        return text;
-    }
+    if(!text.trim() || !isNaN(text.trim())) return text;
 
     const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
 
@@ -1450,36 +1497,201 @@ async function translateSingleLine(text, targetLang, retries){
             throw new Error("Empty translation");
         } catch(err){
             if(attempt < retries){
-                await new Promise(r => setTimeout(r, 200 * Math.pow(2, attempt)));
+                await new Promise(r => setTimeout(r, 300 * Math.pow(2, attempt)));
             }
         }
     }
-    return text; // keep original so nothing is dropped
+    return text;
 }
 
-function makeSinhalaSpoken(text){
-    if(!text) return text;
-    return text
-        .replace(/වේවා/g, "වේන්")
-        .replace(/කරයි/g, "කරනවා")
-        .replace(/යයි/g, "යනවා")
-        .replace(/පවසයි/g, "කියනවා")
-        .replace(/ඇත/g, "තියෙනවා")
-        .replace(/වේ/g, "වෙනවා")
-        .replace(/නිසා/g, "හින්දා")
-        .replace(/සඳහා/g, "වුවමනා");
+/* Parse batch response - handles multiple possible JSON shapes */
+function parseBatchResponse(data, expectedCount, originalTexts){
+    if(!Array.isArray(data)) throw new Error("Invalid batch response");
+    if(data.length !== expectedCount) throw new Error("Batch length mismatch");
+
+    const results = new Array(expectedCount);
+    for(let i = 0; i < expectedCount; i++){
+        const item = data[i];
+        if(typeof item === 'string'){
+            results[i] = item;
+        } else if(Array.isArray(item)){
+            if(item.length > 0 && Array.isArray(item[0])){
+                let combined = '';
+                item.forEach(p => { if(Array.isArray(p) && typeof p[0] === 'string') combined += p[0]; });
+                results[i] = combined || originalTexts[i];
+            } else {
+                results[i] = (typeof item[0] === 'string') ? item[0] : originalTexts[i];
+            }
+        } else {
+            results[i] = originalTexts[i];
+        }
+    }
+    return results;
 }
 
-function hexToRgbAss(hex){
-    const c = hex.replace('#', '');
-    const r = c.substring(0, 2);
-    const g = c.substring(2, 4);
-    const b = c.substring(4, 6);
-    return `&H00${b}${g}${r}&`.toUpperCase();
+/* Batch translate - multiple lines in ONE request (up to 15 lines / 1200 chars) */
+async function translateBatch(texts, targetLang, retries){
+    if(retries === undefined) retries = 2;
+    if(!texts.length) return [];
+    if(texts.length === 1){
+        return [await translateSingleLine(texts[0], targetLang)];
+    }
+
+    const params = new URLSearchParams();
+    params.append('client', 'gtx');
+    params.append('sl', 'en');
+    params.append('tl', targetLang);
+    params.append('dt', 't');
+    for(const t of texts) params.append('q', t);
+    const url = 'https://translate.googleapis.com/translate_a/t?' + params.toString();
+
+    for(let attempt = 0; attempt <= retries; attempt++){
+        try{
+            const response = await fetch(url);
+            if(!response.ok) throw new Error("HTTP " + response.status);
+            const data = await response.json();
+            return parseBatchResponse(data, texts.length, texts);
+        } catch(err){
+            if(attempt < retries){
+                await new Promise(r => setTimeout(r, 400 * Math.pow(2, attempt)));
+            }
+        }
+    }
+
+    // Fallback: individual translation (slower but guaranteed)
+    const fallback = [];
+    for(const t of texts){
+        fallback.push(await translateSingleLine(t, targetLang));
+    }
+    return fallback;
+}
+
+/* Split texts into batches by max chars/lines */
+function chunkTexts(texts, maxChars, maxLines){
+    const batches = [];
+    let current = [];
+    let currentLen = 0;
+
+    for(const t of texts){
+        if(current.length > 0 && (currentLen + t.length > maxChars || current.length >= maxLines)){
+            batches.push(current);
+            current = [];
+            currentLen = 0;
+        }
+        current.push(t);
+        currentLen += t.length + 12; // +12 for URL-encoded overhead per q param
+    }
+    if(current.length > 0) batches.push(current);
+    return batches;
+}
+
+/* Check if text has at least one letter (Unicode-aware) */
+function isTranslatable(text){
+    const t = text.trim();
+    if(!t) return false;
+    if(!isNaN(parseFloat(t))) return false;
+    try{
+        return /[\p{L}]/u.test(t);
+    } catch(e){
+        // Fallback for older browsers without Unicode property escapes
+        return /[A-Za-z\u00C0-\u024F\u0370-\u03FF\u0400-\u04FF\u0900-\u097F\u0D80-\u0DFF\u4E00-\u9FFF]/.test(t);
+    }
+}
+
+/* Parse a subtitle file into lines + translatable items */
+function parseSubtitle(content, isAss){
+    const lines = content.replace(/\r\n/g, '\n').split('\n');
+    const translatableLines = [];
+
+    if(isAss){
+        for(let i = 0; i < lines.length; i++){
+            const line = lines[i];
+            if(line.startsWith('Dialogue:')){
+                const parts = line.split(',');
+                if(parts.length >= 10){
+                    const cleanText = parts.slice(9).join(',').replace(/\{[^}]*\}/g, '').trim();
+                    if(cleanText && isTranslatable(cleanText)){
+                        translatableLines.push({ lineIndex: i, text: cleanText, parts });
+                    }
+                }
+            }
+        }
+    } else {
+        for(let i = 0; i < lines.length; i++){
+            const trimmed = lines[i].trim();
+            if(!trimmed) continue;
+            if(trimmed.includes('-->')) continue;
+            if(/^WEBVTT/.test(trimmed)) continue;
+            if(/^NOTE/.test(trimmed)) continue;
+            if(!isNaN(trimmed)) continue;
+            if(isTranslatable(trimmed)){
+                translatableLines.push({ lineIndex: i, text: trimmed });
+            }
+        }
+    }
+
+    return { lines, translatableLines };
+}
+
+/* Rebuild a subtitle file with translations + styling */
+function rebuildSubtitle(parsed, translations, style){
+    const { lines, translatableLines } = parsed;
+    const resultMap = new Map();
+    for(const item of translatableLines){
+        const translated = translations.get(item.text) || item.text;
+        resultMap.set(item.lineIndex, { translated, parts: item.parts });
+    }
+
+    const outputLines = [];
+    for(let i = 0; i < lines.length; i++){
+        if(resultMap.has(i)){
+            const entry = resultMap.get(i);
+            if(style.isAss){
+                const parts = entry.parts.slice();
+                parts[9] = `{${style.assTag}}${entry.translated}`;
+                outputLines.push(parts.join(','));
+            } else {
+                let styledText = entry.translated
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
+                if(style.isBold)   styledText = `<b>${styledText}</b>`;
+                if(style.isItalic) styledText = `<i>${styledText}</i>`;
+                styledText = `<font face="${style.fontName}" color="${style.fontColorHex}">${styledText}</font>`;
+                outputLines.push(styledText);
+            }
+        } else {
+            outputLines.push(lines[i]);
+        }
+    }
+
+    let result = outputLines.join('\n');
+
+    if(!style.isAss){
+        const intro = "\n1\n00:00:01,000 --> 00:00:04,000\n<font color='#00ffcc'>[ Translated by DG SUBZ | gsub.ddns.net ]</font>\n\n";
+        const outro = "\n\n9999\n99:59:58,000 --> 99:59:59,000\n<font color='#00ffcc'>[ Visit gsub.ddns.net ]</font>\n";
+        result = intro + result + outro;
+    }
+
+    return result;
+}
+
+/* =========================================================
+   9) MAIN TRANSLATION - Multi-file, Fast Batch, ZIP output
+========================================================= */
+let finalTranslatedZipBlob = null;
+const finalTranslatedFileName = "DG_Translated_Subtitles.zip";
+
+function resetTranslationUI(){
+    document.getElementById('transBtnText').textContent = "Translate & Apply Styles";
+    document.getElementById('transSpinner').style.display = "none";
+    document.getElementById('transBtn').disabled = false;
+    document.getElementById('progressWrap').classList.remove('show');
 }
 
 async function startTranslation(){
     const fileInput    = document.getElementById('subFile');
+    const files        = Array.from(fileInput.files);
     const targetLang   = document.getElementById('targetLang').value;
     const fontName     = document.getElementById('fontName').value;
     const fontSize     = document.getElementById('fontSize').value;
@@ -1493,16 +1705,13 @@ async function startTranslation(){
     const progressWrap = document.getElementById('progressWrap');
     const progressBar  = document.getElementById('progressBar');
 
-    if(fileInput.files.length === 0){
-        toast("Please select a subtitle file (.srt or .ass) first!", "error");
+    if(files.length === 0){
+        toast("Please select at least one subtitle file (.srt or .ass)!", "error");
         return;
     }
 
-    const file = fileInput.files[0];
-    isAssFile = file.name.toLowerCase().endsWith('.ass');
-
-    finalTranslatedContent = "";
-    btnText.textContent = "Analyzing file...";
+    finalTranslatedZipBlob = null;
+    btnText.textContent = "Reading files...";
     spinner.style.display = "block";
     transBtn.disabled = true;
     downloadBtn.classList.remove('show');
@@ -1511,173 +1720,120 @@ async function startTranslation(){
 
     const isBold   = (fontStyle === 'bold' || fontStyle === 'bolditalic');
     const isItalic = (fontStyle === 'italic' || fontStyle === 'bolditalic');
+    const assColor = hexToRgbAss(fontColorHex);
+    let assTag = `\\fn${fontName}\\fs${fontSize}\\c${assColor}`;
+    if(isBold)   assTag += `\\b1`;
+    if(isItalic) assTag += `\\i1`;
 
-    const reader = new FileReader();
-
-    reader.onload = async function(e){
-        try{
-            const content = e.target.result;
-            const lines = content.replace(/\r\n/g, '\n').split('\n');
-
-            const assColor = hexToRgbAss(fontColorHex);
-            let assTag = `\\fn${fontName}\\fs${fontSize}\\c${assColor}`;
-            if(isBold)   assTag += `\\b1`;
-            if(isItalic) assTag += `\\i1`;
-
-            /* -------- Collect lines that need translation -------- */
-            const jobs = []; // { lineIndex, text, parts? }
-            if(isAssFile){
-                for(let i = 0; i < lines.length; i++){
-                    const line = lines[i];
-                    if(line.startsWith('Dialogue:')){
-                        const parts = line.split(',');
-                        if(parts.length >= 10){
-                            const cleanText = parts.slice(9).join(',')
-                                                   .replace(/\{[^}]*\}/g, '').trim();
-                            if(cleanText){
-                                jobs.push({ lineIndex: i, text: cleanText, parts: parts });
-                            }
-                        }
-                    }
-                }
-            } else {
-                for(let i = 0; i < lines.length; i++){
-                    const trimmed = lines[i].trim();
-                    if(trimmed !== "" && isNaN(trimmed) && !trimmed.includes('-->')){
-                        jobs.push({ lineIndex: i, text: trimmed });
-                    }
-                }
-            }
-
-            const totalJobs = jobs.length;
-
-            if(totalJobs === 0){
-                // Nothing to translate — still produce valid output
-                finalTranslatedContent = content;
-                progressBar.style.width = "100%";
-                btnText.textContent = "Completed Successfully!";
-                spinner.style.display = "none";
-                transBtn.disabled = false;
-                downloadBtn.classList.add('show');
-                toast("No text found to translate.", "error");
-                return;
-            }
-
-            btnText.textContent = `Translating 0 / ${totalJobs}...`;
-
-            /* -------- Parallel translation with concurrency limit -------- */
-            const CONCURRENCY = 6;   // safe parallel requests
-            const results = new Array(totalJobs);
-            let nextIndex = 0;
-            let completed = 0;
-
-            async function worker(){
-                while(true){
-                    const myIndex = nextIndex++;
-                    if(myIndex >= totalJobs) return;
-
-                    const job = jobs[myIndex];
-                    let translated = await translateSingleLine(job.text, targetLang);
-                    if(targetLang === 'si'){
-                        translated = makeSinhalaSpoken(translated);
-                    }
-                    results[myIndex] = translated;
-
-                    completed++;
-                    const prog = Math.round((completed / totalJobs) * 100);
-                    btnText.textContent = `Translating ${completed} / ${totalJobs} (${prog}%)`;
-                    progressBar.style.width = prog + "%";
-                }
-            }
-
-            const workers = [];
-            const workerCount = Math.min(CONCURRENCY, totalJobs);
-            for(let w = 0; w < workerCount; w++){
-                workers.push(worker());
-            }
-            await Promise.all(workers);
-
-            /* -------- Rebuild output using original line order -------- */
-            const resultMap = new Map();
-            jobs.forEach((job, idx) => {
-                resultMap.set(job.lineIndex, { translated: results[idx], parts: job.parts });
-            });
-
-            const outputLines = [];
-            for(let i = 0; i < lines.length; i++){
-                if(resultMap.has(i)){
-                    const entry = resultMap.get(i);
-                    if(isAssFile){
-                        const parts = entry.parts.slice();
-                        parts[9] = `{${assTag}}${entry.translated}`;
-                        outputLines.push(parts.join(','));
-                    } else {
-                        let styledText = entry.translated
-                            .replace(/&/g, '&amp;')
-                            .replace(/</g, '&lt;')
-                            .replace(/>/g, '&gt;');
-                        if(isBold)   styledText = `<b>${styledText}</b>`;
-                        if(isItalic) styledText = `<i>${styledText}</i>`;
-                        styledText = `<font face="${fontName}" color="${fontColorHex}">${styledText}</font>`;
-                        outputLines.push(styledText);
-                    }
-                } else {
-                    outputLines.push(lines[i]);
-                }
-            }
-
-            const rawTranslatedContent = outputLines.join('\n');
-
-            if(!isAssFile){
-                const introMark = "\n1\n00:00:01,000 --> 00:00:04,000\n<font color='#00ffcc'>[ Translated by DG SUBZ | gsub.ddns.net ]</font>\n\n";
-                const outroMark = "\n\n9999\n99:59:58,000 --> 99:59:59,000\n<font color='#00ffcc'>[ Visit gsub.ddns.net ]</font>\n";
-                finalTranslatedContent = introMark + rawTranslatedContent + outroMark;
-            } else {
-                finalTranslatedContent = rawTranslatedContent;
-            }
-
-            progressBar.style.width = "100%";
-            btnText.textContent = "Completed Successfully!";
-            spinner.style.display = "none";
-            transBtn.disabled = false;
-            downloadBtn.classList.add('show');
-            toast("Translation finished! Click Download to save.", "success");
-
-        } catch(err){
-            console.error(err);
-            btnText.textContent = "Translate & Apply Styles";
-            spinner.style.display = "none";
-            transBtn.disabled = false;
-            progressWrap.classList.remove('show');
-            toast("Translation failed. Please try again.", "error");
+    try{
+        /* ---------- Phase 1: Read & parse all files ---------- */
+        const fileDataList = [];
+        for(let i = 0; i < files.length; i++){
+            const file = files[i];
+            const content = await readFileAsync(file);
+            const isAss = file.name.toLowerCase().endsWith('.ass');
+            const parsed = parseSubtitle(content, isAss);
+            fileDataList.push({ file, isAss, parsed });
+            progressBar.style.width = Math.round(((i + 1) / files.length) * 5) + "%";
         }
-    };
 
-    reader.onerror = function(){
-        btnText.textContent = "Translate & Apply Styles";
+        /* ---------- Phase 2: Collect unique translatable lines ---------- */
+        const uniqueTexts = new Set();
+        for(const fd of fileDataList){
+            for(const item of fd.parsed.translatableLines){
+                uniqueTexts.add(item.text);
+            }
+        }
+        const textsToTranslate = Array.from(uniqueTexts);
+
+        if(textsToTranslate.length === 0){
+            toast("No text found to translate.", "error");
+            resetTranslationUI();
+            return;
+        }
+
+        /* ---------- Phase 3: Translate in batches (parallel) ---------- */
+        btnText.textContent = `Translating ${textsToTranslate.length} unique lines...`;
+        progressBar.style.width = "5%";
+
+        const batches = chunkTexts(textsToTranslate, 1200, 15);
+        const translations = new Map();
+
+        let nextBatch = 0;
+        let completedBatches = 0;
+        const CONCURRENCY = 5;
+
+        async function worker(){
+            while(true){
+                const myIdx = nextBatch++;
+                if(myIdx >= batches.length) return;
+                const batch = batches[myIdx];
+                const results = await translateBatch(batch, targetLang);
+                batch.forEach((text, i) => {
+                    translations.set(text, results[i] || text);
+                });
+                completedBatches++;
+                const prog = 5 + Math.round((completedBatches / batches.length) * 85);
+                progressBar.style.width = prog + "%";
+                btnText.textContent = `Translating... ${completedBatches}/${batches.length} batches (${prog}%)`;
+            }
+        }
+
+        const workers = [];
+        const workerCount = Math.min(CONCURRENCY, batches.length);
+        for(let w = 0; w < workerCount; w++) workers.push(worker());
+        await Promise.all(workers);
+
+        /* ---------- Phase 4: Rebuild files & package as ZIP ---------- */
+        btnText.textContent = "Packaging files into ZIP...";
+        progressBar.style.width = "92%";
+
+        const zip = new JSZip();
+        const style = { isAss: false, assTag, fontName, fontSize, fontColorHex, isBold, isItalic };
+
+        for(let i = 0; i < fileDataList.length; i++){
+            const fd = fileDataList[i];
+            style.isAss = fd.isAss;
+            const rebuilt = rebuildSubtitle(fd.parsed, translations, style);
+            const baseName = fd.file.name.replace(/\.[^.]+$/, '');
+            const ext = fd.isAss ? '.ass' : '.srt';
+            zip.file(baseName + '_DG_Subz' + ext, rebuilt);
+            progressBar.style.width = (92 + Math.round(((i + 1) / fileDataList.length) * 6)) + "%";
+        }
+
+        finalTranslatedZipBlob = await zip.generateAsync({
+            type: "blob",
+            compression: "DEFLATE",
+            compressionOptions: { level: 1 }
+        });
+
+        progressBar.style.width = "100%";
+        btnText.textContent = `Completed! (${files.length} file${files.length > 1 ? 's' : ''} translated)`;
         spinner.style.display = "none";
         transBtn.disabled = false;
-        progressWrap.classList.remove('show');
-        toast("Could not read the file.", "error");
-    };
+        downloadBtn.classList.add('show');
+        toast(`Translation finished! ${files.length} file(s) ready. Click Download.`, "success");
 
-    reader.readAsText(file);
+    } catch(err){
+        console.error(err);
+        resetTranslationUI();
+        toast("Translation failed. Please try again.", "error");
+    }
 }
 
 function downloadTranslatedFile(){
-    if(!finalTranslatedContent){
+    if(!finalTranslatedZipBlob){
         toast("Nothing to download yet.", "error");
         return;
     }
-    const blob = new Blob([finalTranslatedContent], { type: 'text/plain;charset=utf-8' });
     const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = downloadedFileName;
+    link.href = URL.createObjectURL(finalTranslatedZipBlob);
+    link.download = finalTranslatedFileName;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     setTimeout(()=> URL.revokeObjectURL(link.href), 4000);
-    toast("Subtitle downloaded ✅", "success");
+    toast("ZIP downloaded ✅", "success");
 }
 </script>
 
