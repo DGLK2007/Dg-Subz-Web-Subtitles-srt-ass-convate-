@@ -2,300 +2,1684 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>DG UI PRIMAM — Premium Component Library</title>
-    <meta name="monetag" content="681b46b63df5f9cc715feeb72a05f288">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DG SUBZ | Subtitle Translator & Converter</title>
 
-<script>(function(s){s.dataset.zone='11881204',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
-
-<script src="https://5gvci.com/act/files/tag.min.js?z=11881211" data-cfasync="false" async></script>
-
-<script>(function(s){s.dataset.zone='11881233',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
-
+<!-- Google Fonts & FontAwesome -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- JSZip -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<style>
+/* ============ THEME VARIABLES ============ */
+:root{
+    --bg-color:#0a0e21;
+    --bg-soft:#0f1428;
+    --card-bg:#141a2f;
+    --card-bg-2:#1a2140;
+    --card-border:rgba(148,163,184,.14);
+    --card-border-hover:rgba(139,92,246,.5);
+    --text-color:#eef2ff;
+    --text-muted:#8b93b0;
+    --primary:#6366f1;
+    --primary-2:#8b5cf6;
+    --primary-soft:rgba(99,102,241,.14);
+    --accent:#a855f7;
+    --accent-2:#ec4899;
+    --success:#10b981;
+    --danger:#ef4444;
+    --border-color:rgba(148,163,184,.16);
+    --dropzone-bg:#0d1226;
+    --shadow-soft:0 8px 22px rgba(0,0,0,.25);
+    --shadow-glow:0 12px 28px rgba(99,102,241,.28);
+    --nav-bg:rgba(15,20,40,.85);
+}
+[data-theme="light"]{
+    --bg-color:#f4f6fc;
+    --bg-soft:#eef1fa;
+    --card-bg:#ffffff;
+    --card-bg-2:#f7f9ff;
+    --card-border:rgba(100,116,139,.14);
+    --card-border-hover:rgba(139,92,246,.4);
+    --text-color:#0f172a;
+    --text-muted:#64748b;
+    --primary:#6366f1;
+    --primary-2:#8b5cf6;
+    --primary-soft:rgba(99,102,241,.1);
+    --accent:#8b5cf6;
+    --accent-2:#ec4899;
+    --success:#10b981;
+    --danger:#ef4444;
+    --border-color:rgba(100,116,139,.2);
+    --dropzone-bg:#f9fafe;
+    --shadow-soft:0 8px 22px rgba(15,23,42,.06);
+    --shadow-glow:0 12px 28px rgba(99,102,241,.2);
+    --nav-bg:rgba(255,255,255,.9);
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+}
+html,body{ overflow-x:hidden; }
+
+body{
+    background-color:var(--bg-color);
+    background-image:
+        radial-gradient(circle at 12% -10%, rgba(99,102,241,.10), transparent 45%),
+        radial-gradient(circle at 100% 100%, rgba(168,85,247,.08), transparent 45%);
+    background-attachment:fixed;
+    color:var(--text-color);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:20px 18px 44px;
+    transition:background-color .3s ease,color .3s ease;
+    -webkit-font-smoothing:antialiased;
+}
+
+/* ============ NAVBAR ============ */
+.navbar{
+    position:sticky;
+    top:12px;
+    z-index:60;
+    width:100%;
+    max-width:1040px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:10px 14px;
+    border-radius:16px;
+    background:var(--nav-bg);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    border:1px solid var(--card-border);
+    box-shadow:var(--shadow-soft);
+    margin-bottom:26px;
+}
+.brand-title{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:20px;
+    font-weight:700;
+    letter-spacing:-.3px;
+    color:var(--text-color);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    white-space:nowrap;
+    cursor:pointer;
+    padding:4px 6px;
+    transition:transform .2s ease;
+}
+.brand-title:hover{ transform:translateY(-1px); }
+.brand-logo{
+    width:32px;
+    height:32px;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg,var(--primary),var(--primary-2));
+    color:#fff;
+    font-size:14px;
+    box-shadow:0 6px 14px rgba(99,102,241,.35);
+}
+.brand-title span{
+    background:linear-gradient(135deg,var(--primary),var(--primary-2));
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.nav-links{
+    display:flex;
+    align-items:center;
+    gap:4px;
+    flex-wrap:wrap;
+    justify-content:center;
+    padding:4px;
+    background:var(--card-bg-2);
+    border:1px solid var(--card-border);
+    border-radius:12px;
+}
+.nav-btn{
+    background:transparent;
+    border:none;
+    color:var(--text-muted);
+    padding:8px 14px;
+    border-radius:9px;
+    cursor:pointer;
+    font-size:13px;
+    font-weight:600;
+    font-family:'Outfit',sans-serif;
+    letter-spacing:.2px;
+    display:flex;
+    align-items:center;
+    gap:7px;
+    transition:background-color .18s ease,color .18s ease;
+    white-space:nowrap;
+}
+.nav-btn i{ font-size:12px; opacity:.85; }
+.nav-btn:hover{
+    color:var(--text-color);
+    background:var(--primary-soft);
+}
+.nav-btn.active{
+    color:#fff;
+    background:linear-gradient(135deg,var(--primary),var(--primary-2));
+    box-shadow:0 4px 12px rgba(99,102,241,.35);
+}
+.nav-btn.active i{ opacity:1; }
+
+.theme-toggle{
+    background:var(--card-bg-2);
+    border:1px solid var(--card-border);
+    color:var(--text-color);
+    width:40px;
+    height:40px;
+    border-radius:11px;
+    cursor:pointer;
+    font-size:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:transform .2s ease,background-color .2s ease,border-color .2s ease;
+    flex-shrink:0;
+}
+.theme-toggle:hover{
+    transform:translateY(-1px);
+    border-color:var(--card-border-hover);
+    background:var(--primary-soft);
+}
+
+/* ============ PAGES ============ */
+main{
+    width:100%;
+    max-width:1040px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+.page{ display:none; width:100%; }
+.page.active{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    animation:pageIn .3s ease;
+}
+@keyframes pageIn{
+    from{opacity:0;transform:translateY(8px);}
+    to{opacity:1;transform:translateY(0);}
+}
+
+/* ============ HERO ============ */
+.hero{
+    width:100%;
+    max-width:840px;
+    text-align:center;
+    padding:40px 22px 16px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:20px;
+}
+.hero-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-size:12px;
+    font-weight:600;
+    font-family:'Outfit',sans-serif;
+    letter-spacing:.5px;
+    text-transform:uppercase;
+    color:var(--accent);
+    padding:7px 14px;
+    border-radius:999px;
+    background:rgba(168,85,247,.1);
+    border:1px solid rgba(168,85,247,.25);
+}
+.hero-badge i{ font-size:11px; }
+
+.hero-title{
+    font-family:'Outfit',sans-serif;
+    font-size:clamp(44px,10vw,84px);
+    font-weight:800;
+    letter-spacing:-3px;
+    line-height:1;
+    background:linear-gradient(135deg,var(--primary) 0%,var(--primary-2) 50%,var(--accent-2) 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    padding:2px 0;
+}
+.hero-sub{
+    font-size:15.5px;
+    line-height:1.75;
+    color:var(--text-muted);
+    max-width:620px;
+    font-weight:400;
+}
+.hero-sub b{
+    color:var(--text-color);
+    font-weight:600;
+}
+
+.hero-actions{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+    justify-content:center;
+    margin-top:14px;
+    width:100%;
+}
+.hero-btn{
+    padding:16px 28px;
+    border-radius:14px;
+    border:none;
+    cursor:pointer;
+    font-size:14.5px;
+    font-weight:700;
+    font-family:'Outfit',sans-serif;
+    letter-spacing:.3px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:11px;
+    color:#fff;
+    background:linear-gradient(135deg,var(--primary),var(--primary-2));
+    box-shadow:0 10px 24px rgba(99,102,241,.32);
+    transition:transform .2s ease,box-shadow .2s ease,filter .2s ease;
+    min-width:230px;
+}
+.hero-btn i{ font-size:14px; opacity:.95; }
+.hero-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 14px 32px rgba(99,102,241,.45);
+    filter:brightness(1.05);
+}
+.hero-btn:active{
+    transform:translateY(0) scale(.99);
+}
+
+/* ============ FEATURE CARDS ============ */
+.features{
+    width:100%;
+    max-width:980px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:18px;
+    margin-top:48px;
+    padding:0 4px;
+}
+.feature-card{
+    position:relative;
+    background:var(--card-bg);
+    border:1px solid var(--card-border);
+    border-radius:20px;
+    padding:28px 24px 26px;
+    text-align:center;
+    box-shadow:var(--shadow-soft);
+    transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;
+    overflow:hidden;
+}
+.feature-card::before{
+    content:"";
+    position:absolute;
+    top:0;left:0;right:0;
+    height:3px;
+    background:linear-gradient(90deg,var(--primary),var(--primary-2));
+    opacity:0;
+    transition:opacity .25s ease;
+}
+.feature-card:hover{
+    transform:translateY(-6px);
+    box-shadow:var(--shadow-glow);
+    border-color:var(--card-border-hover);
+}
+.feature-card:hover::before{ opacity:1; }
+
+.feature-icon{
+    width:62px;
+    height:62px;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:23px;
+    color:#fff;
+    margin:0 auto 18px;
+    position:relative;
+    transition:transform .3s ease;
+}
+.feature-card:hover .feature-icon{ transform:scale(1.06); }
+.feature-icon.free{
+    background:linear-gradient(135deg,#10b981,#059669);
+    box-shadow:0 10px 22px rgba(16,185,129,.32);
+}
+.feature-icon.fast{
+    background:linear-gradient(135deg,#f59e0b,#f97316);
+    box-shadow:0 10px 22px rgba(245,158,11,.32);
+}
+.feature-icon.secure{
+    background:linear-gradient(135deg,var(--primary),var(--primary-2));
+    box-shadow:0 10px 22px rgba(99,102,241,.32);
+}
+
+.feature-card h3{
+    font-family:'Outfit',sans-serif;
+    font-size:16.5px;
+    font-weight:700;
+    letter-spacing:.6px;
+    margin-bottom:9px;
+    color:var(--text-color);
+}
+.feature-card p{
+    font-size:13.5px;
+    line-height:1.7;
+    color:var(--text-muted);
+}
+
+/* ============ CONTAINER ============ */
+.container{
+    background:var(--card-bg);
+    padding:30px 28px;
+    border-radius:22px;
+    width:100%;
+    max-width:660px;
+    box-shadow:var(--shadow-soft);
+    border:1px solid var(--card-border);
+}
+h2.section-title{
+    text-align:center;
+    margin-bottom:24px;
+    font-family:'Outfit',sans-serif;
+    font-weight:700;
+    font-size:21px;
+    letter-spacing:-.2px;
+    color:var(--text-color);
+    padding-bottom:14px;
+    position:relative;
+}
+h2.section-title::after{
+    content:"";
+    position:absolute;
+    bottom:0;left:50%;
+    transform:translateX(-50%);
+    width:52px;height:3px;
+    border-radius:3px;
+    background:linear-gradient(90deg,var(--primary),var(--primary-2));
+}
+
+.form-group{ margin-bottom:20px; }
+
+label{
+    display:block;
+    margin-bottom:9px;
+    font-weight:600;
+    font-size:13px;
+    letter-spacing:.2px;
+    color:var(--text-color);
+    font-family:'Outfit',sans-serif;
+}
+
+/* ============ DROP ZONE ============ */
+.file-drop-zone{
+    border:1.5px dashed var(--border-color);
+    background:var(--dropzone-bg);
+    padding:30px 20px;
+    text-align:center;
+    border-radius:14px;
+    cursor:pointer;
+    position:relative;
+    overflow:hidden;
+    transition:border-color .2s ease,background-color .2s ease,transform .2s ease;
+}
+.file-drop-zone:hover{
+    border-color:var(--primary-2);
+    background:var(--primary-soft);
+    transform:translateY(-1px);
+}
+.file-drop-zone i{
+    font-size:32px;
+    color:var(--primary-2);
+    margin-bottom:10px;
+    display:inline-block;
+    transition:transform .25s ease;
+}
+.file-drop-zone:hover i{ transform:translateY(-3px); }
+.file-drop-zone p{
+    font-size:13px;
+    color:var(--text-muted);
+    font-weight:500;
+    line-height:1.5;
+}
+.file-drop-zone input{
+    position:absolute;
+    top:0;left:0;
+    width:100%;height:100%;
+    opacity:0;
+    cursor:pointer;
+    z-index:2;
+}
+
+.file-list-display,
+.file-name-display{
+    margin-top:10px;
+    font-size:12.5px;
+    color:var(--text-color);
+    font-weight:500;
+    max-height:130px;
+    overflow-y:auto;
+    padding:11px 14px;
+    border-radius:11px;
+    background:var(--dropzone-bg);
+    border:1px solid var(--border-color);
+    line-height:1.7;
+}
+.file-list-display:empty,
+.file-name-display:empty{ display:none; }
+.file-list-display b,
+.file-name-display b{ color:var(--primary-2); font-family:'Outfit',sans-serif; }
+.file-list-display::-webkit-scrollbar{ width:5px; }
+.file-list-display::-webkit-scrollbar-track{ background:transparent; }
+.file-list-display::-webkit-scrollbar-thumb{
+    background:var(--primary-2);
+    border-radius:10px;
+}
+
+/* ============ INPUTS / SELECTS ============ */
+select,input[type="text"]{
+    width:100%;
+    padding:13px 15px;
+    border-radius:11px;
+    border:1px solid var(--border-color);
+    background:var(--dropzone-bg);
+    color:var(--text-color);
+    font-size:14px;
+    font-weight:500;
+    outline:none;
+    font-family:'Inter',sans-serif;
+    transition:border-color .18s ease,box-shadow .18s ease,background-color .18s ease;
+}
+select{
+    cursor:pointer;
+    appearance:none;
+    -webkit-appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b93b0' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat:no-repeat;
+    background-position:right 15px center;
+    background-size:15px;
+    padding-right:42px;
+}
+[data-theme="light"] select{
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+}
+select:focus,input[type="text"]:focus{
+    border-color:var(--primary-2);
+    box-shadow:0 0 0 3px var(--primary-soft);
+    background:var(--card-bg);
+}
+input[type="color"]{
+    width:100%;
+    height:48px;
+    padding:5px;
+    border-radius:11px;
+    border:1px solid var(--border-color);
+    background:var(--dropzone-bg);
+    cursor:pointer;
+    transition:border-color .18s ease,box-shadow .18s ease;
+}
+input[type="color"]:focus{
+    border-color:var(--primary-2);
+    box-shadow:0 0 0 3px var(--primary-soft);
+    outline:none;
+}
+input[type="color"]::-webkit-color-swatch-wrapper{ padding:2px; }
+input[type="color"]::-webkit-color-swatch{
+    border:none;
+    border-radius:7px;
+}
+
+.style-grid{
+    display:grid;
+    grid-template-columns:1.4fr 1fr 1.2fr;
+    gap:10px;
+}
+
+/* ============ BUTTONS ============ */
+button.convert-btn{
+    width:100%;
+    padding:15px;
+    background:linear-gradient(135deg,var(--primary),var(--primary-2));
+    color:#fff;
+    border:none;
+    border-radius:12px;
+    font-size:14.5px;
+    font-weight:700;
+    font-family:'Outfit',sans-serif;
+    letter-spacing:.4px;
+    cursor:pointer;
+    box-shadow:0 8px 20px rgba(99,102,241,.32);
+    transition:transform .18s ease,box-shadow .18s ease,filter .18s ease;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:11px;
+}
+button.convert-btn:hover:not(:disabled){
+    transform:translateY(-2px);
+    box-shadow:0 12px 26px rgba(99,102,241,.42);
+    filter:brightness(1.05);
+}
+button.convert-btn:active:not(:disabled){
+    transform:translateY(0) scale(.99);
+}
+button.convert-btn:disabled{ cursor:not-allowed; opacity:.8; }
+
+button.download-btn{
+    width:100%;
+    padding:15px;
+    background:linear-gradient(135deg,#10b981,#059669);
+    color:#fff;
+    border:none;
+    border-radius:12px;
+    font-size:14.5px;
+    font-weight:700;
+    font-family:'Outfit',sans-serif;
+    letter-spacing:.4px;
+    cursor:pointer;
+    box-shadow:0 8px 20px rgba(16,185,129,.3);
+    margin-top:12px;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    transition:transform .18s ease,box-shadow .18s ease,filter .18s ease;
+}
+button.download-btn.show{ display:flex; animation:fadeUp .3s ease; }
+button.download-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 12px 26px rgba(16,185,129,.42);
+    filter:brightness(1.05);
+}
+@keyframes fadeUp{
+    from{opacity:0;transform:translateY(8px);}
+    to{opacity:1;transform:translateY(0);}
+}
+
+.spinner{
+    display:none;
+    width:18px;
+    height:18px;
+    border:2.5px solid rgba(255,255,255,.35);
+    border-radius:50%;
+    border-top-color:#fff;
+    animation:spin .7s linear infinite;
+}
+@keyframes spin{ to{transform:rotate(360deg);} }
+
+/* ============ PROGRESS ============ */
+.progress-wrap{
+    display:none;
+    margin-top:14px;
+    height:7px;
+    width:100%;
+    border-radius:99px;
+    background:rgba(148,163,184,.15);
+    overflow:hidden;
+}
+.progress-wrap.show{ display:block; }
+.progress-bar{
+    height:100%;
+    width:0%;
+    border-radius:99px;
+    background:linear-gradient(90deg,var(--primary),var(--primary-2));
+    transition:width .2s ease;
+}
+
+/* ============ INSTRUCTIONS ============ */
+.instructions{
+    margin-top:24px;
+    background:var(--card-bg);
+    padding:22px 24px;
+    border-radius:18px;
+    width:100%;
+    max-width:660px;
+    border:1px solid var(--card-border);
+    box-shadow:var(--shadow-soft);
+}
+.instructions h3{
+    font-size:15px;
+    margin-bottom:12px;
+    font-family:'Outfit',sans-serif;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    gap:9px;
+    color:var(--text-color);
+}
+.instructions h3 i{
+    font-size:15px;
+    color:var(--primary-2);
+}
+.instructions ol{
+    padding-left:20px;
+    font-size:13.5px;
+    color:var(--text-muted);
+    line-height:1.85;
+}
+.instructions li{
+    margin-bottom:6px;
+    padding-left:4px;
+    transition:color .2s ease;
+}
+.instructions li:hover{ color:var(--text-color); }
+.instructions b{ color:var(--primary-2); font-weight:600; }
+
+/* ============ ABOUT ============ */
+.about-card{
+    width:100%;
+    max-width:760px;
+    background:var(--card-bg);
+    border:1px solid var(--card-border);
+    border-radius:22px;
+    padding:34px 30px;
+    box-shadow:var(--shadow-soft);
+    text-align:center;
+}
+.avatar-img{
+    width:108px;
+    height:108px;
+    margin:0 auto 18px;
+    border-radius:50%;
+    object-fit:cover;
+    display:block;
+    border:3px solid var(--primary-2);
+    box-shadow:0 10px 26px rgba(99,102,241,.35);
+}
+.about-card h2{
+    font-family:'Outfit',sans-serif;
+    font-size:25px;
+    font-weight:700;
+    margin-bottom:6px;
+    color:var(--text-color);
+}
+.about-role{
+    font-size:12.5px;
+    color:var(--text-muted);
+    font-weight:600;
+    letter-spacing:.7px;
+    text-transform:uppercase;
+    margin-bottom:20px;
+    font-family:'Outfit',sans-serif;
+}
+.about-text{
+    font-size:14px;
+    line-height:1.85;
+    color:var(--text-muted);
+    max-width:620px;
+    margin:0 auto 26px;
+}
+.about-text b{ color:var(--text-color); font-weight:600; }
+.info-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+    gap:12px;
+    margin-bottom:24px;
+}
+.info-item{
+    background:var(--dropzone-bg);
+    border:1px solid var(--border-color);
+    border-radius:14px;
+    padding:16px 15px;
+    display:flex;
+    align-items:center;
+    gap:13px;
+    text-align:left;
+    transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
+}
+.info-item:hover{
+    transform:translateY(-3px);
+    border-color:var(--card-border-hover);
+    box-shadow:var(--shadow-glow);
+}
+.info-item i{
+    width:42px;
+    height:42px;
+    flex-shrink:0;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:16px;
+    color:#fff;
+    background:linear-gradient(135deg,var(--primary),var(--primary-2));
+}
+.info-item.wa i{ background:linear-gradient(135deg,#25d366,#128c7e); }
+.info-item.age i{ background:linear-gradient(135deg,#f59e0b,#ef4444); }
+.info-item.loc i{ background:linear-gradient(135deg,#ec4899,#a855f7); }
+.info-item .lbl{
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.8px;
+    color:var(--text-muted);
+    font-weight:600;
+    font-family:'Outfit',sans-serif;
+    margin-bottom:2px;
+}
+.info-item .val{
+    font-size:13.5px;
+    font-weight:600;
+    color:var(--text-color);
+    word-break:break-all;
+}
+.info-item a{ color:inherit; text-decoration:none; }
+.info-item a:hover{ color:var(--primary-2); }
+
+.about-tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:center;
+    margin-top:6px;
+}
+.tag{
+    font-size:12px;
+    font-weight:600;
+    font-family:'Outfit',sans-serif;
+    padding:7px 14px;
+    border-radius:999px;
+    color:var(--primary-2);
+    background:var(--primary-soft);
+    border:1px solid rgba(139,92,246,.25);
+    transition:background-color .2s ease,color .2s ease,transform .2s ease;
+}
+.tag:hover{
+    transform:translateY(-2px);
+    background:linear-gradient(135deg,var(--primary),var(--primary-2));
+    color:#fff;
+    border-color:transparent;
+}
+
+/* ============ FOOTER ============ */
+.footer{
+    margin-top:36px;
+    font-size:12.5px;
+    text-align:center;
+    color:var(--text-muted);
+    font-family:'Space Grotesk',sans-serif;
+    letter-spacing:.4px;
+    line-height:1.9;
+}
+.footer i{ margin:0 3px; }
+
+/* ============ TOAST ============ */
+.toast{
+    position:fixed;
+    left:50%;
+    bottom:26px;
+    transform:translate(-50%,140%);
+    background:linear-gradient(135deg,var(--primary),var(--primary-2));
+    color:#fff;
+    padding:13px 22px;
+    border-radius:12px;
+    font-size:13.5px;
+    font-weight:600;
+    font-family:'Outfit',sans-serif;
+    box-shadow:0 14px 32px rgba(99,102,241,.42);
+    z-index:200;
+    opacity:0;
+    transition:transform .3s ease,opacity .3s ease;
+    pointer-events:none;
+    max-width:88vw;
+    text-align:center;
+}
+.toast.show{ transform:translate(-50%,0); opacity:1; }
+.toast.error{
+    background:linear-gradient(135deg,#ef4444,#dc2626);
+    box-shadow:0 14px 32px rgba(239,68,68,.4);
+}
+.toast.success{
+    background:linear-gradient(135deg,#10b981,#059669);
+    box-shadow:0 14px 32px rgba(16,185,129,.4);
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:820px){
+    .navbar{ flex-wrap:wrap; justify-content:center; }
+    .brand-title{ font-size:18px; }
+    .nav-links{ order:3; width:100%; }
+    .nav-btn{ flex:1 1 auto; justify-content:center; padding:8px 10px; font-size:12.5px; }
+    .nav-btn i{ display:none; }
+}
+@media (max-width:520px){
+    body{ padding:14px 12px 36px; }
+    .container{ padding:22px 18px; border-radius:18px; }
+    h2.section-title{ font-size:18px; }
+    .hero{ padding:20px 8px 4px; }
+    .hero-btn{ width:100%; justify-content:center; min-width:0; }
+    .file-drop-zone{ padding:24px 14px; }
+    .file-drop-zone i{ font-size:28px; }
+    .instructions{ padding:18px; }
+    .style-grid{ grid-template-columns:1fr 1fr; }
+    .style-grid select:first-child{ grid-column:1 / -1; }
+    .about-card{ padding:26px 18px; }
+    .about-card h2{ font-size:22px; }
+}
+</style>
 </head>
-<body>
 
-<div class="v on" id="v-land">
-  <div class="land">
-    <div class="land-topbar">
-      <div class="land-brand">
-        <div class="land-brand-ic">D</div>
-        <div class="land-brand-tx"><b>DG UI PRIMAM</b><span>Premium Library</span></div>
-      </div>
-      <button class="tb-btn" id="landThemeBtn" type="button"><i class="fa-solid fa-moon"></i></button>
+<body data-theme="dark">
+
+<!-- ================= NAVBAR ================= -->
+<header class="navbar">
+    <div class="brand-title" onclick="showPage('home')">
+        <span class="brand-logo"><i class="fa-solid fa-bolt"></i></span>
+        <span>DG SUBZ</span>
     </div>
-    <div class="land-hero">
-      <div class="land-title">DG UI PRIMAM</div>
-      <div class="land-tag">Premium · Component Library</div>
-    </div>
-    <div class="land-desc">
-      <p>A handcrafted collection of <span id="landTotal">500+</span> premium HTML, CSS &amp; JavaScript snippets built for developers who refuse to compromise on design.</p>
-    </div>
-    <button class="land-cta" id="getStartBtn" type="button">Get Start Free <span>→</span></button>
-    <div class="land-hint"><strong>Click "Get Start Free"</strong> to create your account and unlock the full library.</div>
-    <div class="land-feats" id="feats">
-      <div class="feat"><div class="feat-ic"><i class="fa-solid fa-shield-halved"></i></div><h4>Safety First</h4><p>Your account stays private and secure. Every component is tested and 100% clean — copy with confidence.</p></div>
-      <div class="feat"><div class="feat-ic"><i class="fa-solid fa-gem"></i></div><h4>100% Free Forever</h4><p>Every snippet is free — no hidden charges, no premium tier. Create an account and start building.</p></div>
-      <div class="feat"><div class="feat-ic"><i class="fa-solid fa-bolt"></i></div><h4>Blazing Fast</h4><p>Lightweight code with zero dependencies — every snippet loads instantly. Built for speed.</p></div>
-    </div>
-  </div>
-</div>
 
-<div class="v" id="v-auth">
-  <div class="auth">
-    <div class="auth-card">
-      <button class="auth-back" id="authBack" type="button">← Back</button>
-      <div class="auth-brand"><div class="auth-ic">D</div><h2>DG UI PRIMAM</h2></div>
-      <div class="auth-tabs">
-        <button class="auth-tab on" data-tab="in" type="button">Sign In</button>
-        <button class="auth-tab" data-tab="up" type="button">Create Account</button>
-      </div>
-      <div class="auth-err" id="authErr"></div>
-      <form class="auth-form on" id="formIn">
-        <div class="fld"><label>Username or Gmail</label><input class="in" id="inId" type="text" placeholder="username or you@gmail.com"></div>
-        <div class="fld"><label>Password</label><input class="in" id="inPass" type="password" placeholder="••••••••"></div>
-        <button class="auth-btn" id="btnIn" type="submit">Sign In</button>
-        <div class="auth-sw">No account? <button type="button" data-goto="up">Create one</button></div>
-      </form>
-      <form class="auth-form" id="formUp">
-        <div class="fld"><label>Full Name</label><input class="in" id="upName" type="text" placeholder="Dasun Gimahana"></div>
-        <div class="fld-row">
-          <div class="fld"><label>Gmail</label><input class="in" id="upEmail" type="email" placeholder="you@gmail.com"></div>
-          <div class="fld"><label>Phone</label><input class="in" id="upPhone" type="tel" placeholder="07X XXXX XXX"></div>
-        </div>
-        <div class="fld"><label>Username</label><input class="in" id="upUser" type="text" placeholder="dasun_dev"></div>
-        <div class="fld-row">
-          <div class="fld"><label>Password</label><input class="in" id="upPass" type="password" placeholder="Min 6 chars"></div>
-          <div class="fld"><label>Confirm</label><input class="in" id="upPass2" type="password" placeholder="Repeat"></div>
-        </div>
-        <div class="vchk" id="vchk"><div class="vchk-box"></div><div class="vchk-txt">I'm not a robot — <strong>verify me</strong></div></div>
-        <button class="auth-btn" id="btnUp" type="submit">Create Account</button>
-        <div class="auth-sw">Have an account? <button type="button" data-goto="in">Sign in</button></div>
-      </form>
-    </div>
-  </div>
-</div>
+    <nav class="nav-links">
+        <button class="nav-btn active" data-page="home" onclick="showPage('home')"><i class="fa-solid fa-house"></i> Home</button>
+        <button class="nav-btn" data-page="translator" onclick="showPage('translator')"><i class="fa-solid fa-language"></i> Translator</button>
+        <button class="nav-btn" data-page="converter" onclick="showPage('converter')"><i class="fa-solid fa-right-left"></i> Converter</button>
+        <button class="nav-btn" data-page="about" onclick="showPage('about')"><i class="fa-solid fa-circle-info"></i> About</button>
+    </nav>
 
-<div class="v" id="v-app">
-  <div class="topbar">
-    <div class="tb-logo" id="tbLogo"><div class="tb-logo-ic">D</div><div class="tb-logo-tx">DG UI PRIMAM</div></div>
-    <div class="tb-spacer"></div>
-    <div class="tb-search"><input id="search" type="text" placeholder="Search components..."></div>
-    <button class="tb-btn" id="themeBtn" type="button"><i class="fa-solid fa-moon"></i></button>
-    <button class="tb-btn burger" id="burger" type="button"><span></span><span></span><span></span></button>
-  </div>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+        <i class="fa-solid fa-moon" id="themeIcon"></i>
+    </button>
+</header>
 
-  <!-- HOME -->
-  <div class="page on" id="page-home">
-    <div class="wrap">
-      <div class="home-hero-new">
-        <div class="home-bg-glow"></div>
-        <div class="home-orb home-orb-1"></div>
-        <div class="home-orb home-orb-2"></div>
-        <div class="home-orb home-orb-3"></div>
-        <div class="home-hero-inner">
-          <div class="home-badge"><span class="home-badge-dot"></span>500+ Premium Snippets</div>
-          <h1 class="home-title">Build <span>beautiful</span><br>interfaces <em>faster</em></h1>
-          <p class="home-sub">Everything you need to craft stunning web experiences — loading spinners, animations, login forms, buttons, colors, fonts and more. All free, all copy-ready.</p>
-          <div class="home-cta">
-            <button class="home-cta-primary" data-page="projects" type="button"><i class="fa-solid fa-rocket"></i> Explore Library</button>
-            <button class="home-cta-ghost" data-page="portfolio" type="button"><i class="fa-solid fa-briefcase"></i> Portfolio Templates</button>
-          </div>
-        </div>
-      </div>
+<main>
 
-      <div class="stats" id="statsGrid"></div>
+    <!-- ================= HOME PAGE ================= -->
+    <section id="page-home" class="page active">
+        <div class="hero">
+            <div class="hero-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> All-in-one Subtitle Toolkit</div>
+            <h1 class="hero-title">DG SUBZ</h1>
+            <p class="hero-sub">
+                Translate subtitles into <b>Sinhala</b>, <b>English</b>, <b>Tamil</b>, <b>Hindi</b> &amp; more —
+                and convert between <b>SRT&nbsp;⇄&nbsp;ASS</b> formats in seconds. Everything runs inside your browser:
+                100% free, super fast, and completely secure.
+            </p>
 
-      <div class="sec">
-        <div class="sec-head-new">
-          <div class="sec-head-line"></div>
-          <h2>How it works</h2>
-          <p>Three simple steps from browsing to shipping</p>
-        </div>
-        <div class="steps-new">
-          <div class="step-new"><div class="step-new-num">01</div><div class="step-new-icon"><i class="fa-solid fa-compass"></i></div><h4>Browse</h4><p>Explore 500+ snippets organized across 11 categories — find exactly what you need.</p></div>
-          <div class="step-new"><div class="step-new-num">02</div><div class="step-new-icon"><i class="fa-solid fa-eye"></i></div><h4>Preview</h4><p>Click any card to open a live preview with formatted code — copy CSS, HTML or JS.</p></div>
-          <div class="step-new"><div class="step-new-num">03</div><div class="step-new-icon"><i class="fa-solid fa-rocket"></i></div><h4>Ship</h4><p>Paste directly into your project — zero dependencies, no build tools, just clean code.</p></div>
-        </div>
-      </div>
-
-      <div class="sec">
-        <div class="sec-head-new">
-          <div class="sec-head-line"></div>
-          <h2>Meet the Developer</h2>
-          <p>Get in touch or follow the journey</p>
-        </div>
-        <div class="dev-hero-new">
-          <div class="dev-hero-inner">
-            <div class="dev-av-new"><span>D</span><div class="dev-status"></div></div>
-            <div class="dev-info-new">
-              <h3>Dasun Gimahana</h3>
-              <p><i class="fa-solid fa-cake-candles"></i> 18 years old · <i class="fa-solid fa-location-dot"></i> Kurunagala, Sri Lanka</p>
-              <div class="dev-tag-new"><i class="fa-solid fa-code"></i> Full-Stack Developer</div>
+            <div class="hero-actions">
+                <button class="hero-btn" onclick="showPage('translator')">
+                    <i class="fa-solid fa-language"></i> Subtitle Translator
+                </button>
+                <button class="hero-btn" onclick="showPage('converter')">
+                    <i class="fa-solid fa-right-left"></i> SRT ⇄ ASS Converter
+                </button>
             </div>
-          </div>
-          <div class="dev-contacts-new" id="devContacts">
-            <a class="dev-link-new" href="https://wa.me/94762664962" target="_blank"><div class="dev-link-ic-new" style="background:linear-gradient(135deg,#25d366,#128c7e)"><i class="fa-brands fa-whatsapp"></i></div><div><b>WhatsApp</b><span>076 266 4962</span></div></a>
-            <a class="dev-link-new" href="https://wa.me/94752664962" target="_blank"><div class="dev-link-ic-new" style="background:linear-gradient(135deg,#25d366,#128c7e)"><i class="fa-brands fa-whatsapp"></i></div><div><b>WhatsApp Alt</b><span>075 266 4962</span></div></a>
-            <a class="dev-link-new" href="https://t.me/DasunTECH" target="_blank"><div class="dev-link-ic-new" style="background:linear-gradient(135deg,#0088cc,#0066aa)"><i class="fa-brands fa-telegram"></i></div><div><b>Telegram</b><span>@DasunTECH</span></div></a>
-            <a class="dev-link-new" href="https://chat.whatsapp.com/GltIUGj2JeN7d5OV10BlJx" target="_blank"><div class="dev-link-ic-new" style="background:linear-gradient(135deg,#25d366,#7c5cff)"><i class="fa-solid fa-users"></i></div><div><b>Group</b><span>Join Community</span></div></a>
-          </div>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- PROJECTS -->
-  <div class="page" id="page-projects">
-    <div class="wrap">
-      <div class="sec-head" style="margin-bottom:16px"><h2 id="projTitle"><span>All</span> Components</h2><p id="projSub">Browse the complete collection</p></div>
-      <div class="filters" id="filters"></div>
-      <div class="grid" id="grid"></div>
-    </div>
-  </div>
-
-  <!-- PORTFOLIO -->
-  <div class="page" id="page-portfolio">
-    <div class="wrap">
-      <div class="sec-head" style="margin-bottom:16px"><h2><span>Portfolio</span> Templates</h2><p>5 unique modern portfolio designs — preview live, get full code from Telegram.</p></div>
-      <div class="grid" id="pfGrid"></div>
-    </div>
-  </div>
-
-  <!-- NAVIGATION BARS -->
-  <div class="page" id="page-navbars">
-    <div class="wrap">
-      <div class="sec-head" style="margin-bottom:16px"><h2><span>Navigation</span> Bars</h2><p>30 beautiful navigation bar designs for modern websites.</p></div>
-      <div class="grid" id="navGrid"></div>
-    </div>
-  </div>
-
-  <!-- CSS COLORS -->
-  <div class="page" id="page-colors">
-    <div class="wrap">
-      <div class="sec-head" style="margin-bottom:16px"><h2><span>CSS</span> Color Codes</h2><p>150+ RGB colors with hex codes. Click any color to copy.</p></div>
-      <div class="color-filters" id="colorFilters"></div>
-      <div class="color-grid" id="colorGrid"></div>
-    </div>
-  </div>
-
-  <!-- RGB TRANSITIONS -->
-  <div class="page" id="page-rgb">
-    <div class="wrap">
-      <div class="sec-head" style="margin-bottom:16px"><h2><span>RGB</span> Transitions</h2><p>25 animated color-changing effects — click any card to copy the CSS code.</p></div>
-      <div class="color-filters" id="rgbFilters"></div>
-      <div class="color-grid" id="rgbGrid"></div>
-    </div>
-  </div>
-
-  <!-- CONTACT BOXES -->
-  <div class="page" id="page-contacts">
-    <div class="wrap">
-      <div class="sec-head" style="margin-bottom:16px"><h2><span>Contact</span> Boxes</h2><p>25 beautifully animated contact box designs.</p></div>
-      <div class="grid" id="contactGrid"></div>
-    </div>
-  </div>
-
-  <!-- GOOGLE FONTS -->
-  <div class="page" id="page-fonts">
-    <div class="wrap">
-      <div class="sec-head" style="margin-bottom:16px"><h2><span>Google</span> Fonts</h2><p>200 most popular Google Fonts with import code.</p></div>
-      <div class="font-search"><input id="fontSearch" type="text" placeholder="Search 200 fonts..."></div>
-      <div class="font-grid" id="fontGrid"></div>
-    </div>
-  </div>
-
-  <!-- PROFILE -->
-  <div class="page" id="page-profile">
-    <div class="wrap">
-      <div class="prof-wrap">
-        <div class="prof-hero">
-          <div class="prof-top">
-            <div class="prof-av-wrap">
-              <div class="prof-av" id="profAv"><span id="profLetter">D</span><img id="profImg" style="display:none" alt=""></div>
-              <div class="prof-av-badge">✓</div>
+        <!-- 3 FEATURE BOXES -->
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon free"><i class="fa-solid fa-gift"></i></div>
+                <h3>100% FREE</h3>
+                <p>Every tool on DG SUBZ is completely free. No sign-up, no hidden charges, no daily limits — just upload and go.</p>
             </div>
-            <div class="prof-info">
-              <h1 id="profName">User</h1>
-              <div class="puser" id="profUser">@user</div>
-              <div class="pemail" id="profEmail">user@gmail.com</div>
-              <div class="prof-tag">⭐ PRIMAM MEMBER</div>
+
+            <div class="feature-card">
+                <div class="feature-icon fast"><i class="fa-solid fa-bolt"></i></div>
+                <h3>SUPER FAST</h3>
+                <p>Batch convert 10+ subtitle files at once and download them as a single ZIP. Translation &amp; styling happen in seconds.</p>
             </div>
-          </div>
-          <div class="prof-stats">
-            <div class="pstat-mini"><strong id="pstatSnippets">0</strong><span>Snippets</span></div>
-            <div class="pstat-mini"><strong>∞</strong><span>Access</span></div>
-            <div class="pstat-mini"><strong id="pstatDays">0</strong><span>Days</span></div>
-            <div class="pstat-mini"><strong id="pstatJoined">—</strong><span>Joined</span></div>
-          </div>
+
+            <div class="feature-card">
+                <div class="feature-icon secure"><i class="fa-solid fa-shield-halved"></i></div>
+                <h3>SECURITY 100%</h3>
+                <p>Your files never touch a server — all processing happens locally in your browser, so your data stays private and safe.</p>
+            </div>
         </div>
-        <div class="prof-grid">
-          <div class="pcard">
-            <h3>Change Name</h3>
-            <div class="fld"><label>Full Name</label><input class="in" id="pmName" type="text"></div>
-            <div class="fld"><label>Username</label><input class="in" id="pmUser" type="text"></div>
-            <div class="fld"><label>Phone</label><input class="in" id="pmPhone" type="tel" placeholder="07X XXXX XXX"></div>
-            <button class="auth-btn" id="pmNameSave" type="button">Save Changes</button>
-            <div class="pstat" id="pmNameOk">✓ Profile updated successfully</div>
-          </div>
-          <div class="pcard">
-            <h3>Change Password</h3>
-            <div class="fld"><label>Current Password</label><input class="in" id="pmOld" type="password"></div>
-            <div class="fld"><label>New Password</label><input class="in" id="pmNew" type="password"></div>
-            <div class="fld"><label>Confirm</label><input class="in" id="pmNew2" type="password"></div>
-            <button class="auth-btn" id="pmPassSave" type="button">Update Password</button>
-            <div class="pstat" id="pmPassOk">✓ Password updated successfully</div>
-          </div>
+    </section>
+
+    <!-- ================= TRANSLATOR PAGE ================= -->
+    <section id="page-translator" class="page">
+        <div class="container">
+            <h2 class="section-title">Advanced Subtitle Translator &amp; Styler</h2>
+
+            <div class="form-group">
+                <label for="targetLang">Select Target Language:</label>
+                <select id="targetLang">
+                    <option value="si">Sinhala (සිංහල)</option>
+                    <option value="en">English</option>
+                    <option value="ta">Tamil (தமிழ்)</option>
+                    <option value="hi">Hindi (हिन्दी)</option>
+                    <option value="es">Spanish (Español)</option>
+                    <option value="fr">French (Français)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Subtitle Styling (Font, Size &amp; Style):</label>
+                <div class="style-grid">
+                    <select id="fontName" title="Font family">
+                        <option value="Arial">Arial</option>
+                        <option value="Poppins">Poppins</option>
+                        <option value="Inter">Inter</option>
+                        <option value="Outfit">Outfit</option>
+                        <option value="Space Grotesk">Space Grotesk</option>
+                        <option value="Verdana">Verdana</option>
+                        <option value="Tahoma">Tahoma</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Trebuchet MS">Trebuchet MS</option>
+                        <option value="Courier New">Courier New</option>
+                        <option value="Segoe UI">Segoe UI</option>
+                        <option value="Roboto">Roboto</option>
+                    </select>
+
+                    <select id="fontSize" title="Font size">
+                        <option value="12">12</option>
+                        <option value="14">14</option>
+                        <option value="16">16</option>
+                        <option value="18">18</option>
+                        <option value="20">20</option>
+                        <option value="22" selected>22</option>
+                        <option value="24">24</option>
+                        <option value="26">26</option>
+                        <option value="28">28</option>
+                        <option value="32">32</option>
+                        <option value="36">36</option>
+                        <option value="40">40</option>
+                    </select>
+
+                    <select id="fontStyle" title="Font style">
+                        <option value="normal" selected>Normal</option>
+                        <option value="bold">Bold</option>
+                        <option value="italic">Italic</option>
+                        <option value="bolditalic">Bold Italic</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Font Color:</label>
+                <input type="color" id="fontColor" title="Choose Font Color" value="#ffff00">
+            </div>
+
+            <div class="form-group">
+                <label>Upload Subtitle File (.srt or .ass):</label>
+                <div class="file-drop-zone">
+                    <i class="fa-solid fa-file-arrow-up"></i>
+                    <p>Drag &amp; drop or Click to upload .srt / .ass file</p>
+                    <input type="file" id="subFile" accept=".srt,.ass" onchange="showFileName(this)">
+                </div>
+                <div class="file-name-display" id="fileNameDisplay"></div>
+            </div>
+
+            <button class="convert-btn" id="transBtn" onclick="startTranslation()">
+                <span id="transBtnText">Translate &amp; Apply Styles</span>
+                <div class="spinner" id="transSpinner"></div>
+            </button>
+
+            <div class="progress-wrap" id="progressWrap">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+
+            <button class="download-btn" id="downloadBtn" onclick="downloadTranslatedFile()">
+                <i class="fa-solid fa-download"></i> Download Formatted Subtitle
+            </button>
         </div>
-      </div>
-    </div>
-  </div>
+
+        <div class="instructions">
+            <h3><i class="fa-solid fa-circle-info"></i> How to Use — Translator</h3>
+            <ol>
+                <li>Select your <b>target language</b> and customize the font, size &amp; style.</li>
+                <li>Upload either a <b>.srt</b> or <b>.ass</b> subtitle file.</li>
+                <li>Click <b>“Translate &amp; Apply Styles”</b> and wait until it reaches 100%.</li>
+                <li>Click the appearing <b>Download</b> button to save your translated subtitle!</li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- ================= CONVERTER PAGE ================= -->
+    <section id="page-converter" class="page">
+        <div class="container">
+            <h2 class="section-title">Multi-Subtitle Converter</h2>
+
+            <div class="form-group">
+                <label>Upload Subtitle Files (Up to 10+ .srt/.ass):</label>
+                <div class="file-drop-zone" id="dropZone">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <p>Drag &amp; drop or Click to select multiple files</p>
+                    <input type="file" id="subFiles" accept=".srt,.ass" multiple onchange="showFileNames(this)">
+                </div>
+                <div class="file-list-display" id="fileListDisplay"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="convertType">Conversion Type:</label>
+                <select id="convertType">
+                    <option value="to_ass">SRT to ASS (Batch)</option>
+                    <option value="to_srt">ASS to SRT (Batch)</option>
+                </select>
+            </div>
+
+            <button class="convert-btn" id="convBtn" onclick="convertBatchSubtitles()">
+                <span id="convBtnText">Convert Files</span>
+                <div class="spinner" id="convSpinner"></div>
+            </button>
+
+            <button class="download-btn" id="convDownloadBtn" onclick="downloadConvertedZip()">
+                <i class="fa-solid fa-download"></i> Download Converted ZIP
+            </button>
+        </div>
+
+        <div class="instructions">
+            <h3><i class="fa-solid fa-circle-info"></i> How to Use — Converter</h3>
+            <ol>
+                <li>Tap the upload box and select <b>multiple subtitle files</b> (10 or more <b>.srt</b> / <b>.ass</b> files at once).</li>
+                <li>Choose your target format from the dropdown menu.</li>
+                <li>Click the <b>“Convert Files”</b> button.</li>
+                <li>Once converted, click <b>“Download Converted ZIP”</b> to save all files as a single ZIP!</li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- ================= ABOUT PAGE ================= -->
+    <section id="page-about" class="page">
+        <div class="about-card">
+            <img class="avatar-img"
+                 src="https://res.cloudinary.com/divxgmr1g/image/upload/v1790246573/njsnhjvfi599swevo6ap.jpg"
+                 alt="Dasun Gimahana">
+            <h2>Dasun Gimahana</h2>
+            <div class="about-role">Founder &amp; Developer — DG SUBZ</div>
+
+            <p class="about-text">
+                <b>DG SUBZ</b> is a free, browser-based subtitle toolkit built for everyone who works with subtitles.
+                It lets you translate <b>.srt</b> and <b>.ass</b> subtitle files into multiple languages and convert
+                between SRT and ASS formats — all in one place. Everything runs locally in your browser, so your
+                files are never uploaded anywhere and your privacy is always protected.
+            </p>
+
+            <div class="info-grid">
+                <div class="info-item wa">
+                    <i class="fa-brands fa-whatsapp"></i>
+                    <div>
+                        <div class="lbl">WhatsApp</div>
+                        <div class="val"><a href="https://wa.me/94743277981" target="_blank" rel="noopener">0743277981</a></div>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <i class="fa-solid fa-user"></i>
+                    <div>
+                        <div class="lbl">Name</div>
+                        <div class="val">Dasun Gimahana</div>
+                    </div>
+                </div>
+
+                <div class="info-item age">
+                    <i class="fa-solid fa-cake-candles"></i>
+                    <div>
+                        <div class="lbl">Age</div>
+                        <div class="val">18 Years</div>
+                    </div>
+                </div>
+
+                <div class="info-item loc">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <div>
+                        <div class="lbl">From</div>
+                        <div class="val">Kurunagala, Sri Lanka</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="about-tags">
+                <span class="tag">🎬 Subtitle Translator</span>
+                <span class="tag">🔄 SRT ⇄ ASS Converter</span>
+                <span class="tag">⚡ Batch ZIP Download</span>
+                <span class="tag">🔒 100% Private</span>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<div class="footer">
+    DG Store &amp; Tech With Dasun &copy; 2026<br>
+    Made with <i class="fa-solid fa-heart" style="color:#ec4899"></i> in Sri Lanka
 </div>
 
-<div class="overlay" id="overlay"></div>
-<aside class="drawer" id="drawer">
-  <div class="drawer-head">
-    <div class="drawer-brand"><div class="drawer-brand-ic">D</div><div class="drawer-brand-tx"><b>DG UI PRIMAM</b><span>Component Library</span></div></div>
-    <button class="drawer-x" id="drawerX" type="button">✕</button>
-  </div>
-  <nav class="drawer-nav" id="drawerNav"></nav>
-  <div class="drawer-user">
-    <div class="drawer-av" id="drawerAv">U</div>
-    <div style="overflow:hidden;flex:1"><div class="drawer-uname" id="drawerName">User</div><div class="drawer-uemail" id="drawerEmail">user@gmail.com</div></div>
-    <button class="tb-btn" id="drawerLogout" title="Logout" style="width:36px;height:36px" type="button"><i class="fa-solid fa-right-from-bracket"></i></button>
-  </div>
-</aside>
+<div class="toast" id="toast"></div>
 
-<div class="modal" id="modal">
-  <div class="modal-box">
-    <div class="modal-head"><h3 id="modalTitle">Component</h3><button class="modal-x" id="modalX" type="button">✕</button></div>
-    <div class="modal-body">
-      <div class="modal-prev"><iframe id="modalFrame" title="preview"></iframe></div>
-      <div class="modal-code">
-        <div class="tabs" id="modalTabs"></div>
-        <div class="code-scroll"><pre class="pre"><code id="modalCode"></code></pre></div>
-      </div>
-    </div>
-    <div class="modal-foot">
-      <a href="https://t.me/Dg_Ui_Project" target="_blank" class="btn btn-tg" id="modalTelegram" style="display:none"><i class="fa-brands fa-telegram"></i> Get Code</a>
-      <button class="btn btn-g" id="modalCopyAll" type="button">Copy All</button>
-      <button class="btn btn-p" id="modalCopy" type="button">Copy Tab</button>
-    </div>
-  </div>
-</div>
+<script>
+/* =========================================================
+   1) NAVIGATION
+========================================================= */
+function showPage(id){
+    document.querySelectorAll('.page').forEach(p=>{
+        p.classList.toggle('active', p.id === 'page-' + id);
+    });
+    document.querySelectorAll('.nav-btn').forEach(b=>{
+        b.classList.toggle('active', b.dataset.page === id);
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-<div class="toast" id="toast">
-  <div class="toast-ic" id="toastIc"><i class="fa-solid fa-check"></i></div>
-  <div><div class="toast-t" id="toastT">Notice</div><div class="toast-m" id="toastM">Message</div></div>
-</div>
+/* =========================================================
+   2) THEME SWITCHER
+========================================================= */
+function applyTheme(theme){
+    document.body.setAttribute('data-theme', theme);
+    const icon = document.getElementById('themeIcon');
+    if(!icon) return;
+    if(theme === 'light'){
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+    } else {
+        icon.classList.remove('fa-sun');
+        icon.classList.add('fa-moon');
+    }
+}
+function toggleTheme(){
+    const isDark = document.body.getAttribute('data-theme') === 'dark';
+    const next = isDark ? 'light' : 'dark';
+    applyTheme(next);
+    try { localStorage.setItem('dgsubz-theme', next); } catch(e){}
+}
+(function initTheme(){
+    let saved = null;
+    try { saved = localStorage.getItem('dgsubz-theme'); } catch(e){}
+    applyTheme(saved || 'dark');
+})();
 
-<input type="file" id="avFile" accept="image/*" style="display:none">
+/* =========================================================
+   3) TOAST
+========================================================= */
+function toast(msg, type){
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'toast show' + (type ? ' ' + type : '');
+    clearTimeout(el._timer);
+    el._timer = setTimeout(()=>{ el.classList.remove('show'); }, 3200);
+}
 
-<script src="script.js"></script>
+/* =========================================================
+   4) FILE DISPLAY
+========================================================= */
+let isAssFile = false;
+let downloadedFileName = "sub_translated.srt";
+
+function showFileName(input){
+    const display = document.getElementById('fileNameDisplay');
+    if(input.files.length > 0){
+        const file = input.files[0];
+        display.innerHTML = '<b>Selected:</b> ' + file.name;
+        isAssFile = file.name.toLowerCase().endsWith('.ass');
+        const ext = isAssFile ? '.ass' : '.srt';
+        const dot = file.name.lastIndexOf('.');
+        const base = dot > 0 ? file.name.substring(0, dot) : file.name;
+        downloadedFileName = base + "_DG_Subz" + ext;
+    } else {
+        display.innerHTML = "";
+    }
+}
+
+function showFileNames(input){
+    const display = document.getElementById('fileListDisplay');
+    if(input.files.length > 0){
+        let text = '<b>Selected Files (' + input.files.length + '):</b><br>';
+        for(let i = 0; i < input.files.length; i++){
+            text += '• ' + input.files[i].name + '<br>';
+        }
+        display.innerHTML = text;
+    } else {
+        display.innerHTML = "";
+    }
+}
+
+/* =========================================================
+   5) SRT <-> ASS CONVERSION
+========================================================= */
+function processSubtitleContent(content, convertType){
+    const lines = content.replace(/\r\n/g, '\n').split('\n');
+    let resultData = "";
+
+    if(convertType === "to_ass"){
+        resultData =
+`[Script Info]
+Title: DG Converted Subtitle
+ScriptType: v4.00+
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+Collisions: Normal
+PlayResX: 384
+PlayResY: 288
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,20,&H00FFFFFF,&H000000FF,&H00000000,&H80000000,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+`;
+        let i = 0;
+        while(i < lines.length){
+            const line = lines[i].trim();
+            if(line.includes('-->')){
+                const times = line.split('-->');
+                let start = times[0].trim().replace(',', '.');
+                let end   = times[1].trim().replace(',', '.');
+                start = formatSrtTimeToAss(start);
+                end   = formatSrtTimeToAss(end);
+
+                const textLines = [];
+                i++;
+                while(i < lines.length && lines[i].trim() !== ""){
+                    textLines.push(lines[i].trim());
+                    i++;
+                }
+                const subText = textLines.join('\\N');
+                if(subText){
+                    resultData += `Dialogue: 0,${start},${end},Default,,0,0,0,,${subText}\n`;
+                }
+            } else { i++; }
+        }
+    } else {
+        let srtIndex = 1;
+        for(const line of lines){
+            if(line.startsWith('Dialogue:')){
+                const parts = line.split(',');
+                if(parts.length >= 10){
+                    const start = formatAssTimeToSrt(parts[1].trim());
+                    const end   = formatAssTimeToSrt(parts[2].trim());
+                    const text  = parts.slice(9).join(',')
+                                        .replace(/\\N/gi, '\n')
+                                        .replace(/\\n/gi, '\n')
+                                        .replace(/\{[^}]*\}/g, '')
+                                        .trim();
+                    resultData += `${srtIndex}\n${start} --> ${end}\n${text}\n\n`;
+                    srtIndex++;
+                }
+            }
+        }
+        if(!resultData){
+            resultData = "1\n00:00:01,000 --> 00:00:05,000\nConverted via DG SUBZ (No dialogue found)\n";
+        }
+    }
+    return resultData;
+}
+
+function formatSrtTimeToAss(timeStr){
+    timeStr = timeStr.trim();
+    const parts = timeStr.split(':');
+    if(parts.length === 3){
+        const hours = parseInt(parts[0], 10) || 0;
+        const minutes = parts[1].padStart(2, '0');
+        const secParts = parts[2].replace(',', '.').split('.');
+        const seconds = secParts[0].padStart(2, '0');
+        let millis = secParts[1] ? secParts[1] : "00";
+        millis = (millis + "00").substring(0, 2);
+        return `${hours}:${minutes}:${seconds}.${millis}`;
+    }
+    return "0:00:00.00";
+}
+
+function formatAssTimeToSrt(timeStr){
+    timeStr = timeStr.trim();
+    const parts = timeStr.split(':');
+    if(parts.length === 3){
+        const hours = parts[0].padStart(2, '0');
+        const minutes = parts[1].padStart(2, '0');
+        const secParts = parts[2].replace('.', ',').split(',');
+        const seconds = secParts[0].padStart(2, '0');
+        let millis = secParts[1] ? secParts[1] : "000";
+        millis = (millis + "000").substring(0, 3);
+        return `${hours}:${minutes}:${seconds},${millis}`;
+    }
+    return "00:00:00,000";
+}
+
+function readFileAsync(file){
+    return new Promise((resolve, reject)=>{
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.onerror = err => reject(err);
+        reader.readAsText(file);
+    });
+}
+
+/* =========================================================
+   6) BATCH CONVERT + SEPARATE DOWNLOAD
+========================================================= */
+let convertedZipBlob = null;
+
+async function convertBatchSubtitles(){
+    const fileInput   = document.getElementById('subFiles');
+    const convertType = document.getElementById('convertType').value;
+    const btnText     = document.getElementById('convBtnText');
+    const spinner     = document.getElementById('convSpinner');
+    const convertBtn  = document.getElementById('convBtn');
+    const downloadBtn = document.getElementById('convDownloadBtn');
+
+    if(fileInput.files.length === 0){
+        toast("Please select at least one subtitle file first!", "error");
+        return;
+    }
+
+    btnText.textContent = "Converting Files...";
+    spinner.style.display = "block";
+    convertBtn.disabled = true;
+    downloadBtn.classList.remove('show');
+    convertedZipBlob = null;
+
+    const zip = new JSZip();
+    const newExtension = (convertType === "to_ass") ? ".ass" : ".srt";
+
+    try{
+        for(let i = 0; i < fileInput.files.length; i++){
+            const file = fileInput.files[i];
+            const content = await readFileAsync(file);
+            const convertedText = processSubtitleContent(content, convertType);
+
+            const originalName = file.name;
+            const dot = originalName.lastIndexOf('.');
+            const baseName = dot > 0 ? originalName.substring(0, dot) : originalName;
+            const newFileName = baseName + "_DG" + newExtension;
+
+            zip.file(newFileName, convertedText);
+        }
+
+        convertedZipBlob = await zip.generateAsync({ type: "blob" });
+        downloadBtn.classList.add('show');
+        toast("Conversion complete! Click Download to save ZIP.", "success");
+    } catch(err){
+        console.error(err);
+        toast("Something went wrong while converting. Please try again.", "error");
+    } finally {
+        btnText.textContent = "Convert Files";
+        spinner.style.display = "none";
+        convertBtn.disabled = false;
+    }
+}
+
+function downloadConvertedZip(){
+    if(!convertedZipBlob){
+        toast("Please convert files first.", "error");
+        return;
+    }
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(convertedZipBlob);
+    link.download = "DG_Converted_Subtitles.zip";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(()=> URL.revokeObjectURL(link.href), 4000);
+    toast("ZIP downloaded ✅", "success");
+}
+
+/* =========================================================
+   7) TRANSLATOR (Fast parallel + retry-safe)
+========================================================= */
+let finalTranslatedContent = "";
+
+/* Translate one line with retries */
+async function translateSingleLine(text, targetLang, retries){
+    if(retries === undefined) retries = 3;
+    if(!text.trim() || !isNaN(text.trim()) || text.includes('-->')){
+        return text;
+    }
+
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+
+    for(let attempt = 0; attempt <= retries; attempt++){
+        try{
+            const response = await fetch(url, { method: 'GET' });
+            if(!response.ok) throw new Error("HTTP " + response.status);
+            const data = await response.json();
+            if(data && data[0] && Array.isArray(data[0])){
+                let translated = '';
+                data[0].forEach(item=>{
+                    if(item && item[0]) translated += item[0];
+                });
+                if(translated && translated.trim()) return translated;
+            }
+            throw new Error("Empty translation");
+        } catch(err){
+            if(attempt < retries){
+                await new Promise(r => setTimeout(r, 200 * Math.pow(2, attempt)));
+            }
+        }
+    }
+    return text; // keep original so nothing is dropped
+}
+
+function makeSinhalaSpoken(text){
+    if(!text) return text;
+    return text
+        .replace(/වේවා/g, "වේන්")
+        .replace(/කරයි/g, "කරනවා")
+        .replace(/යයි/g, "යනවා")
+        .replace(/පවසයි/g, "කියනවා")
+        .replace(/ඇත/g, "තියෙනවා")
+        .replace(/වේ/g, "වෙනවා")
+        .replace(/නිසා/g, "හින්දා")
+        .replace(/සඳහා/g, "වුවමනා");
+}
+
+function hexToRgbAss(hex){
+    const c = hex.replace('#', '');
+    const r = c.substring(0, 2);
+    const g = c.substring(2, 4);
+    const b = c.substring(4, 6);
+    return `&H00${b}${g}${r}&`.toUpperCase();
+}
+
+async function startTranslation(){
+    const fileInput    = document.getElementById('subFile');
+    const targetLang   = document.getElementById('targetLang').value;
+    const fontName     = document.getElementById('fontName').value;
+    const fontSize     = document.getElementById('fontSize').value;
+    const fontStyle    = document.getElementById('fontStyle').value;
+    const fontColorHex = document.getElementById('fontColor').value || "#ffff00";
+
+    const btnText      = document.getElementById('transBtnText');
+    const spinner      = document.getElementById('transSpinner');
+    const transBtn     = document.getElementById('transBtn');
+    const downloadBtn  = document.getElementById('downloadBtn');
+    const progressWrap = document.getElementById('progressWrap');
+    const progressBar  = document.getElementById('progressBar');
+
+    if(fileInput.files.length === 0){
+        toast("Please select a subtitle file (.srt or .ass) first!", "error");
+        return;
+    }
+
+    const file = fileInput.files[0];
+    isAssFile = file.name.toLowerCase().endsWith('.ass');
+
+    finalTranslatedContent = "";
+    btnText.textContent = "Analyzing file...";
+    spinner.style.display = "block";
+    transBtn.disabled = true;
+    downloadBtn.classList.remove('show');
+    progressWrap.classList.add('show');
+    progressBar.style.width = "0%";
+
+    const isBold   = (fontStyle === 'bold' || fontStyle === 'bolditalic');
+    const isItalic = (fontStyle === 'italic' || fontStyle === 'bolditalic');
+
+    const reader = new FileReader();
+
+    reader.onload = async function(e){
+        try{
+            const content = e.target.result;
+            const lines = content.replace(/\r\n/g, '\n').split('\n');
+
+            const assColor = hexToRgbAss(fontColorHex);
+            let assTag = `\\fn${fontName}\\fs${fontSize}\\c${assColor}`;
+            if(isBold)   assTag += `\\b1`;
+            if(isItalic) assTag += `\\i1`;
+
+            /* -------- Collect lines that need translation -------- */
+            const jobs = []; // { lineIndex, text, parts? }
+            if(isAssFile){
+                for(let i = 0; i < lines.length; i++){
+                    const line = lines[i];
+                    if(line.startsWith('Dialogue:')){
+                        const parts = line.split(',');
+                        if(parts.length >= 10){
+                            const cleanText = parts.slice(9).join(',')
+                                                   .replace(/\{[^}]*\}/g, '').trim();
+                            if(cleanText){
+                                jobs.push({ lineIndex: i, text: cleanText, parts: parts });
+                            }
+                        }
+                    }
+                }
+            } else {
+                for(let i = 0; i < lines.length; i++){
+                    const trimmed = lines[i].trim();
+                    if(trimmed !== "" && isNaN(trimmed) && !trimmed.includes('-->')){
+                        jobs.push({ lineIndex: i, text: trimmed });
+                    }
+                }
+            }
+
+            const totalJobs = jobs.length;
+
+            if(totalJobs === 0){
+                // Nothing to translate — still produce valid output
+                finalTranslatedContent = content;
+                progressBar.style.width = "100%";
+                btnText.textContent = "Completed Successfully!";
+                spinner.style.display = "none";
+                transBtn.disabled = false;
+                downloadBtn.classList.add('show');
+                toast("No text found to translate.", "error");
+                return;
+            }
+
+            btnText.textContent = `Translating 0 / ${totalJobs}...`;
+
+            /* -------- Parallel translation with concurrency limit -------- */
+            const CONCURRENCY = 6;   // safe parallel requests
+            const results = new Array(totalJobs);
+            let nextIndex = 0;
+            let completed = 0;
+
+            async function worker(){
+                while(true){
+                    const myIndex = nextIndex++;
+                    if(myIndex >= totalJobs) return;
+
+                    const job = jobs[myIndex];
+                    let translated = await translateSingleLine(job.text, targetLang);
+                    if(targetLang === 'si'){
+                        translated = makeSinhalaSpoken(translated);
+                    }
+                    results[myIndex] = translated;
+
+                    completed++;
+                    const prog = Math.round((completed / totalJobs) * 100);
+                    btnText.textContent = `Translating ${completed} / ${totalJobs} (${prog}%)`;
+                    progressBar.style.width = prog + "%";
+                }
+            }
+
+            const workers = [];
+            const workerCount = Math.min(CONCURRENCY, totalJobs);
+            for(let w = 0; w < workerCount; w++){
+                workers.push(worker());
+            }
+            await Promise.all(workers);
+
+            /* -------- Rebuild output using original line order -------- */
+            const resultMap = new Map();
+            jobs.forEach((job, idx) => {
+                resultMap.set(job.lineIndex, { translated: results[idx], parts: job.parts });
+            });
+
+            const outputLines = [];
+            for(let i = 0; i < lines.length; i++){
+                if(resultMap.has(i)){
+                    const entry = resultMap.get(i);
+                    if(isAssFile){
+                        const parts = entry.parts.slice();
+                        parts[9] = `{${assTag}}${entry.translated}`;
+                        outputLines.push(parts.join(','));
+                    } else {
+                        let styledText = entry.translated
+                            .replace(/&/g, '&amp;')
+                            .replace(/</g, '&lt;')
+                            .replace(/>/g, '&gt;');
+                        if(isBold)   styledText = `<b>${styledText}</b>`;
+                        if(isItalic) styledText = `<i>${styledText}</i>`;
+                        styledText = `<font face="${fontName}" color="${fontColorHex}">${styledText}</font>`;
+                        outputLines.push(styledText);
+                    }
+                } else {
+                    outputLines.push(lines[i]);
+                }
+            }
+
+            const rawTranslatedContent = outputLines.join('\n');
+
+            if(!isAssFile){
+                const introMark = "\n1\n00:00:01,000 --> 00:00:04,000\n<font color='#00ffcc'>[ Translated by DG SUBZ | gsub.ddns.net ]</font>\n\n";
+                const outroMark = "\n\n9999\n99:59:58,000 --> 99:59:59,000\n<font color='#00ffcc'>[ Visit gsub.ddns.net ]</font>\n";
+                finalTranslatedContent = introMark + rawTranslatedContent + outroMark;
+            } else {
+                finalTranslatedContent = rawTranslatedContent;
+            }
+
+            progressBar.style.width = "100%";
+            btnText.textContent = "Completed Successfully!";
+            spinner.style.display = "none";
+            transBtn.disabled = false;
+            downloadBtn.classList.add('show');
+            toast("Translation finished! Click Download to save.", "success");
+
+        } catch(err){
+            console.error(err);
+            btnText.textContent = "Translate & Apply Styles";
+            spinner.style.display = "none";
+            transBtn.disabled = false;
+            progressWrap.classList.remove('show');
+            toast("Translation failed. Please try again.", "error");
+        }
+    };
+
+    reader.onerror = function(){
+        btnText.textContent = "Translate & Apply Styles";
+        spinner.style.display = "none";
+        transBtn.disabled = false;
+        progressWrap.classList.remove('show');
+        toast("Could not read the file.", "error");
+    };
+
+    reader.readAsText(file);
+}
+
+function downloadTranslatedFile(){
+    if(!finalTranslatedContent){
+        toast("Nothing to download yet.", "error");
+        return;
+    }
+    const blob = new Blob([finalTranslatedContent], { type: 'text/plain;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = downloadedFileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(()=> URL.revokeObjectURL(link.href), 4000);
+    toast("Subtitle downloaded ✅", "success");
+}
+</script>
+
 </body>
 </html>
